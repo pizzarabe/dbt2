@@ -37,7 +37,7 @@ else:
             parser.error('"--dbms pgsql" requires --dbname to be used')
         else:
             dbname = options.dbname
-    elif dbms == 'mysql' or dbms == 'drizzle' or dbms == 'sqlite':
+    elif dbms == 'mysql' or dbms == 'drizzle' or dbms == 'sqlite' or dbms == 'nuodb':
         # No special scripts yet to run for these databases but this is needed
         # in order for the report script to run.
        pass

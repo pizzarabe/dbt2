@@ -49,56 +49,56 @@ PG_FUNCTION_INFO_V1(stock_level);
 
 Datum stock_level(PG_FUNCTION_ARGS)
 {
-	/* Input variables. */
-	int32 w_id = PG_GETARG_INT32(0);
-	int32 d_id = PG_GETARG_INT32(1);
-	int32 threshold = PG_GETARG_INT32(2);
+    /* Input variables. */
+    int32 w_id = PG_GETARG_INT32(0);
+    int32 d_id = PG_GETARG_INT32(1);
+    int32 threshold = PG_GETARG_INT32(2);
 
-	TupleDesc tupdesc;
-	SPITupleTable *tuptable;
-	HeapTuple tuple;
+    TupleDesc tupdesc;
+    SPITupleTable *tuptable;
+    HeapTuple tuple;
 
-	int d_next_o_id = 0;
-	int low_stock = 0;
-	int ret;
-	char query[256];
-	char *buf;
+    int d_next_o_id = 0;
+    int low_stock = 0;
+    int ret;
+    char query[256];
+    char *buf;
 
-	SPI_connect();
+    SPI_connect();
 
-	sprintf(query, STOCK_LEVEL_1, w_id, d_id);
-	elog(DEBUG1, "%s", query);
-	ret = SPI_exec(query, 0);
-	if (ret == SPI_OK_SELECT && SPI_processed > 0) {
-		tupdesc = SPI_tuptable->tupdesc;
-		tuptable = SPI_tuptable;
-		tuple = tuptable->vals[0];
+    sprintf(query, STOCK_LEVEL_1, w_id, d_id);
+    elog(DEBUG1, "%s", query);
+    ret = SPI_exec(query, 0);
+    if (ret == SPI_OK_SELECT && SPI_processed > 0) {
+        tupdesc = SPI_tuptable->tupdesc;
+        tuptable = SPI_tuptable;
+        tuple = tuptable->vals[0];
 
-		buf = SPI_getvalue(tuple, tupdesc, 1);
-		elog(DEBUG1, "d_next_o_id = %s", buf);
-		d_next_o_id = atoi(buf);
-	} else {
-		SPI_finish();
-		PG_RETURN_INT32(-1);
-	}
+        buf = SPI_getvalue(tuple, tupdesc, 1);
+        elog(DEBUG1, "d_next_o_id = %s", buf);
+        d_next_o_id = atoi(buf);
+    } else {
+        SPI_finish();
+        PG_RETURN_INT32(-1);
+    }
 
-	sprintf(query, STOCK_LEVEL_2, w_id, d_id, threshold, d_next_o_id - 20,
-			d_next_o_id - 1);
-	elog(DEBUG1, "%s", query);
-	ret = SPI_exec(query, 0);
-	if (ret == SPI_OK_SELECT && SPI_processed > 0) {
-		tupdesc = SPI_tuptable->tupdesc;
-		tuptable = SPI_tuptable;
-		tuple = tuptable->vals[0];
+    sprintf(query, STOCK_LEVEL_2, w_id, d_id, threshold, d_next_o_id - 20,
+            d_next_o_id - 1);
+    elog(DEBUG1, "%s", query);
+    ret = SPI_exec(query, 0);
+    if (ret == SPI_OK_SELECT && SPI_processed > 0) {
+        tupdesc = SPI_tuptable->tupdesc;
+        tuptable = SPI_tuptable;
+        tuple = tuptable->vals[0];
 
-		buf = SPI_getvalue(tuple, tupdesc, 1);
-		elog(DEBUG1, "low_stock = %s", buf);
-		low_stock = atoi(buf);
-	} else {
-		SPI_finish();
-		PG_RETURN_INT32(-1);
-	}
+        buf = SPI_getvalue(tuple, tupdesc, 1);
+        elog(DEBUG1, "low_stock = %s", buf);
+        low_stock = atoi(buf);
+    } else {
+        SPI_finish();
+        PG_RETURN_INT32(-1);
+    }
 
-	SPI_finish();
-	PG_RETURN_INT32(low_stock);
+    SPI_finish();
+    PG_RETURN_INT32(low_stock);
 }

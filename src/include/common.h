@@ -20,14 +20,14 @@
 #include <time.h>
 #include <sys/time.h>
 
-#if defined(ODBC) || defined(LIBMYSQL) || defined(LIBDRIZZLE)
-#define DB_USER "dbt"
-#define DB_PASS ""
-#endif /* ODBC || LIBMYSQL || LIBDRIZZLE */
+#if defined(ODBC) || defined(LIBMYSQL) || defined(LIBDRIZZLE) || defined(NUODB)
+#define DB_USER "dbt2"
+#define DB_PASS "dbt2"
+#endif /* ODBC || LIBMYSQL || LIBDRIZZLE || NUODB */
 
-#if defined(LIBPQ) || defined(LIBMYSQL) || defined(LIBDRIZZLE)
+#if defined(LIBPQ) || defined(LIBMYSQL) || defined(LIBDRIZZLE) || defined(NUODB)
 #define DB_NAME "dbt2"
-#endif /* LIBPQ || LIBMYSQL || LIBDRIZZLE */
+#endif /* LIBPQ || LIBMYSQL || LIBDRIZZLE || NUODB */
 
 #define DELIVERY 0
 #define NEW_ORDER 1
@@ -52,7 +52,11 @@
 #define STATUS_ROLLBACK 4
 #define ERROR_RECEIVE_TIMEOUT 5
 
+#ifdef NUODB
+#define A_STRING_CHAR_LEN 90
+#else
 #define A_STRING_CHAR_LEN 128
+#endif
 #define L_STRING_CHAR_LEN 52
 #define N_STRING_CHAR_LEN 10
 #define TIMESTAMP_LEN 28
@@ -136,6 +140,6 @@ extern char output_path[256];
 extern const char *c_last_syl[C_LAST_SYL_MAX];
 extern struct table_cardinality_t table_cardinality;
 extern const char transaction_short_name[TRANSACTION_MAX];
-extern char *transaction_name[TRANSACTION_MAX];
+extern char const *transaction_name[TRANSACTION_MAX];
 
 #endif /* _COMMON_H_ */

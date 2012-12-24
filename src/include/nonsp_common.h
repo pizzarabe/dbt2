@@ -23,6 +23,10 @@
 #include "mysql_common.h"
 #endif
 
+#ifdef NUODB
+#include "nuodb_common.h"
+#endif
+
 #ifdef LIBDRIZZLE
 #include "drizzle_common.h"
 #endif
@@ -31,6 +35,7 @@
 #include "sqlite_common.h"
 #endif
 
+void get_current_timestamp(char * buffer);
 void dbt2_escape_str(char *orig_str, char *esc_str);
 int dbt2_init_values(char ** values, int max_values);
 int dbt2_free_values(char ** values, int max_values);
@@ -63,7 +68,7 @@ int dbt2_free_values(char ** values, int max_values);
 
 #define DELIVERY_5 \
 	"UPDATE order_line\n" \
-	"SET ol_delivery_d = current_timestamp\n" \
+	"SET ol_delivery_d = %s\n" \
 	"WHERE ol_o_id = %s\n" \
 	"  AND ol_w_id = %d\n" \
 	"  AND ol_d_id = %d"
@@ -123,7 +128,7 @@ int dbt2_free_values(char ** values, int max_values);
 #define NEW_ORDER_6 \
 	"INSERT INTO orders (o_id, o_d_id, o_w_id, o_c_id, o_entry_d,\n" \
 	"                    o_carrier_id, o_ol_cnt, o_all_local)\n" \
-	"VALUES (%s, %d, %d, %d, current_timestamp, NULL, %d, %d)"
+	"VALUES (%s, %d, %d, %d, %s, NULL, %d, %d)"
 
 #define NEW_ORDER_7 \
 	"SELECT i_price, i_name, i_data\n" \
@@ -246,7 +251,7 @@ int dbt2_free_values(char ** values, int max_values);
 #define PAYMENT_8 \
 	"INSERT INTO history (h_c_id, h_c_d_id, h_c_w_id, h_d_id, h_w_id,\n" \
 	"                     h_date, h_amount, h_data)\n" \
-	"VALUES (%d, %d, %d, %d, %d, current_timestamp, %f, '%s    %s')"
+	"VALUES (%d, %d, %d, %d, %d, %s, %f, '%s    %s')"
 
 #define STOCK_LEVEL_1 \
 	"SELECT d_next_o_id\n" \

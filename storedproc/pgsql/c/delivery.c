@@ -83,102 +83,102 @@ PG_FUNCTION_INFO_V1(delivery);
 
 Datum delivery(PG_FUNCTION_ARGS)
 {
-	/* Input variables. */
-	int32 w_id = PG_GETARG_INT32(0);
-	int32 o_carrier_id = PG_GETARG_INT32(1);
+    /* Input variables. */
+    int32 w_id = PG_GETARG_INT32(0);
+    int32 o_carrier_id = PG_GETARG_INT32(1);
 
-	TupleDesc tupdesc;
-	SPITupleTable *tuptable;
-	HeapTuple tuple;
+    TupleDesc tupdesc;
+    SPITupleTable *tuptable;
+    HeapTuple tuple;
 
-	char query[256];
-	int d_id;
-	int ret;
-	char *no_o_id = NULL;
-	char *o_c_id = NULL;
-	char *ol_amount = NULL;
+    char query[256];
+    int d_id;
+    int ret;
+    char *no_o_id = NULL;
+    char *o_c_id = NULL;
+    char *ol_amount = NULL;
 
-	SPI_connect();
+    SPI_connect();
 
-	for (d_id = 1; d_id <= 10; d_id++) {
-		sprintf(query, DELIVERY_1, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret == SPI_OK_SELECT && SPI_processed > 0) {
-			tupdesc = SPI_tuptable->tupdesc;
-			tuptable = SPI_tuptable;
-			tuple = tuptable->vals[0];
+    for (d_id = 1; d_id <= 10; d_id++) {
+        sprintf(query, DELIVERY_1, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret == SPI_OK_SELECT && SPI_processed > 0) {
+            tupdesc = SPI_tuptable->tupdesc;
+            tuptable = SPI_tuptable;
+            tuple = tuptable->vals[0];
 
-			no_o_id = SPI_getvalue(tuple, tupdesc, 1);
-			elog(DEBUG1, "no_o_id = %s", no_o_id);
-		} else {
-			/* Nothing to deliver for this district, try next district. */
-			continue;
-		}
+            no_o_id = SPI_getvalue(tuple, tupdesc, 1);
+            elog(DEBUG1, "no_o_id = %s", no_o_id);
+        } else {
+            /* Nothing to deliver for this district, try next district. */
+            continue;
+        }
 
-		sprintf(query, DELIVERY_2, no_o_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret != SPI_OK_DELETE) {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
+        sprintf(query, DELIVERY_2, no_o_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret != SPI_OK_DELETE) {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
 
-		sprintf(query, DELIVERY_3, no_o_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret == SPI_OK_SELECT && SPI_processed > 0) {
-			tupdesc = SPI_tuptable->tupdesc;
-			tuptable = SPI_tuptable;
-			tuple = tuptable->vals[0];
+        sprintf(query, DELIVERY_3, no_o_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret == SPI_OK_SELECT && SPI_processed > 0) {
+            tupdesc = SPI_tuptable->tupdesc;
+            tuptable = SPI_tuptable;
+            tuple = tuptable->vals[0];
 
-			o_c_id = SPI_getvalue(tuple, tupdesc, 1);
-			elog(DEBUG1, "o_c_id = %s", no_o_id);
-		} else {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
+            o_c_id = SPI_getvalue(tuple, tupdesc, 1);
+            elog(DEBUG1, "o_c_id = %s", no_o_id);
+        } else {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
 
-		sprintf(query, DELIVERY_4, o_carrier_id, no_o_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret != SPI_OK_UPDATE) {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
+        sprintf(query, DELIVERY_4, o_carrier_id, no_o_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret != SPI_OK_UPDATE) {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
 
-		sprintf(query, DELIVERY_5, no_o_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret != SPI_OK_UPDATE) {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
+        sprintf(query, DELIVERY_5, no_o_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret != SPI_OK_UPDATE) {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
 
-		sprintf(query, DELIVERY_6, no_o_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret == SPI_OK_SELECT && SPI_processed > 0) {
-			tupdesc = SPI_tuptable->tupdesc;
-			tuptable = SPI_tuptable;
-			tuple = tuptable->vals[0];
+        sprintf(query, DELIVERY_6, no_o_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret == SPI_OK_SELECT && SPI_processed > 0) {
+            tupdesc = SPI_tuptable->tupdesc;
+            tuptable = SPI_tuptable;
+            tuple = tuptable->vals[0];
 
-			ol_amount = SPI_getvalue(tuple, tupdesc, 1);
-			elog(DEBUG1, "ol_amount = %s", no_o_id);
-		} else {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
+            ol_amount = SPI_getvalue(tuple, tupdesc, 1);
+            elog(DEBUG1, "ol_amount = %s", no_o_id);
+        } else {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
 
-		sprintf(query, DELIVERY_7, ol_amount, o_c_id, w_id, d_id);
-		elog(DEBUG1, "%s", query);
-		ret = SPI_exec(query, 0);
-		if (ret != SPI_OK_UPDATE) {
-			SPI_finish();
-			PG_RETURN_INT32(-1);
-		}
-	}
+        sprintf(query, DELIVERY_7, ol_amount, o_c_id, w_id, d_id);
+        elog(DEBUG1, "%s", query);
+        ret = SPI_exec(query, 0);
+        if (ret != SPI_OK_UPDATE) {
+            SPI_finish();
+            PG_RETURN_INT32(-1);
+        }
+    }
 
-	SPI_finish();
-	PG_RETURN_INT32(1);
+    SPI_finish();
+    PG_RETURN_INT32(1);
 }

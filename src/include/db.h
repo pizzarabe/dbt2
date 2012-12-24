@@ -28,6 +28,10 @@
 #include "mysql_common.h"
 #endif /* LIBMYSQL */
 
+#ifdef NUODB
+#include "nuodb_common.h"
+#endif /* NUODB */
+
 #ifdef LIBDRIZZLE
 #include "drizzle_common.h"
 #endif /* LIBDRIZZLE */
@@ -48,6 +52,10 @@ int db_init(char *_dbname, char *_pghost, char *_pgport);
 int db_init(char * _mysql_dbname, char *_mysql_host, char * _mysql_user,
             char * _mysql_pass, char * _mysql_port, char * _mysql_socket);
 #endif /* LIBMYSQL */
+
+#ifdef NUODB
+int db_init(char const * database, char const * username, char const * password, const char * timezone, const char * schema);
+#endif /* NUODB */
 
 #ifdef LIBDRIZZLE
 int db_init(char * _drizzle_dbname, char *_drizzle_host, char * _drizzle_user,

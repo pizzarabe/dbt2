@@ -1,7 +1,67 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
-PROJECT(dbt2 C)
+PROJECT(dbt2 C CXX)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
 
+INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
+
+SET(CPACK_CMAKE_GENERATOR "Unix Makefiles")
+SET(CPACK_PACKAGE_NAME "DBT2")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Database Test 2")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "42")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+SET(CPACK_GENERATOR "TGZ")
+SET(CPACK_PACKAGE_VENDOR "NuoDB")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "README")
+SET(CPACK_RESOURCE_FILE_LICENSE "LICENSE")
+INCLUDE(CPack)
+
+CHECK_FUNCTION_EXISTS(bind HAVE_BIND)
+CHECK_FUNCTION_EXISTS(recv HAVE_RECV)
+CHECK_FUNCTION_EXISTS(send HAVE_SEND)
+CHECK_FUNCTION_EXISTS(accept HAVE_ACCEPT)
+CHECK_FUNCTION_EXISTS(listen HAVE_LISTEN)
+CHECK_FUNCTION_EXISTS(getprotobyname HAVE_GETPROTOBYNAME)
+CHECK_FUNCTION_EXISTS(socket HAVE_SOCKET)
+CHECK_FUNCTION_EXISTS(setsockopt HAVE_SETSOCKOPT)
+CHECK_FUNCTION_EXISTS(connect HAVE_CONNECT)
+CHECK_FUNCTION_EXISTS(nanosleep HAVE_NANOSLEEP)
+
+ADD_DEFINITIONS(-D_REENTRANT)
+ADD_DEFINITIONS(-D_PTHREAD_SAFE)
+
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    ADD_DEFINITIONS(-D_GNU_SOURCE)
+    ADD_DEFINITIONS(-D_POSIX_C_SOURCE=199309L)
+    CHECK_LIBRARY_EXISTS("rt" "sem_init" "" HAVE_LIBRT)
+ELSEIF (${CMAKE_SYSTEM_NAME} MATCHES "Solaris")
+    ADD_DEFINITIONS(-D_POSIX_C_SOURCE=199309L)
+    ADD_DEFINITIONS(-D_PTHREADS)
+    CHECK_LIBRARY_EXISTS(socket bind "" HAVE_LIBSOCKET)
+    CHECK_LIBRARY_EXISTS(nsl gethostbyaddr "" HAVE_LIBNSL)
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+    EXECUTE_PROCESS(
+        COMMAND
+            getconf LFS64_CFLAGS
+        OUTPUT_VARIABLE
+            LFS_CFLAGS
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+ELSE (CMAKE_SIZEOF_VOID_P MATCHES "8")
+    EXECUTE_PROCESS(
+        COMMAND
+            getconf LFS_CFLAGS
+        OUTPUT_VARIABLE
+            LFS_CFLAGS
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
 
 #
 # Defining binaries so to minimized typoes.
@@ -11,59 +71,6 @@ SET(DBT2_CLIENT bin/dbt2-client)
 SET(DBT2_DATAGEN bin/dbt2-datagen)
 SET(DBT2_DRIVER bin/dbt2-driver)
 SET(DBT2_TXN_TEST bin/dbt2-transaction-test)
-
-#
-# Check for large file support by using 'getconf'.
-#
-
-FIND_PROGRAM(GETCONF getconf)
-IF (GETCONF)
-    SET(GETCONF_FOUND TRUE)
-ENDIF (GETCONF)
-
-IF (GETCONF_FOUND)
-    EXECUTE_PROCESS(COMMAND ${GETCONF} LFS_CFLAGS COMMAND ${GETCONF}
-            LFS64_CFLAGS OUTPUT_VARIABLE LFS_CFLAGS
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-ENDIF (GETCONF_FOUND)
-
-# Check for libraries.
-
-# Solaris links nanosleep via librt.  Linux does not.  Check if the library
-# exists and set the linker flags below if it does.  If we don't fint this
-# library, then assume we don't need to link anything.
-CHECK_LIBRARY_EXISTS(rt nanosleep "" HAVE_NANOSLEEP)
-IF (HAVE_NANOSLEEP)
-    SET (NEED_LIBRT TRUE)
-ENDIF (HAVE_NANOSLEEP)
-
-# FIXME: If one of these passes, then hopefully the rest will pass.  libsocket
-# is required on Solaris.
-CHECK_LIBRARY_EXISTS(socket bind "" HAVE_BIND)
-CHECK_LIBRARY_EXISTS(socket recv "" HAVE_RECV)
-CHECK_LIBRARY_EXISTS(socket send "" HAVE_SEND)
-CHECK_LIBRARY_EXISTS(socket accept "" HAVE_ACCEPT)
-CHECK_LIBRARY_EXISTS(socket listen "" HAVE_LISTEN)
-CHECK_LIBRARY_EXISTS(socket getprotobyname "" HAVE_GETPROTOBYNAME)
-CHECK_LIBRARY_EXISTS(socket socket "" HAVE_SOCKET)
-CHECK_LIBRARY_EXISTS(socket setsockopt "" HAVE_SETSOCKOPT)
-CHECK_LIBRARY_EXISTS(socket connect "" HAVE_CONNECT)
-IF (HAVE_BIND AND HAVE_RECV AND HAVE_SEND AND HAVE_ACCEPT AND
-    HAVE_LISTEN AND HAVE_GETPROTOBYNAME AND HAVE_SOCKET AND
-    HAVE_SETSOCKOPT AND HAVE_CONNECT)
-    SET (NEED_LIBSOCKET TRUE)
-ENDIF (HAVE_BIND AND HAVE_RECV AND HAVE_SEND AND HAVE_ACCEPT AND
-       HAVE_LISTEN AND HAVE_GETPROTOBYNAME AND HAVE_SOCKET AND
-       HAVE_SETSOCKOPT AND HAVE_CONNECT)
-
-# FIXME: If one of these passes, then hopefully the rest will pass.  libnsl
-# is required on Solaris.
-CHECK_LIBRARY_EXISTS(nsl gethostbyaddr "" HAVE_GETHOSTBYADDR)
-CHECK_LIBRARY_EXISTS(nsl gethostbyname "" HAVE_GETHOSTBYNAME)
-CHECK_LIBRARY_EXISTS(nsl inet_addr "" HAVE_INET_ADDR)
-IF (HAVE_GETHOSTBYADDR AND HAVE_GETHOSTBYNAME AND HAVE_INET_ADDR)
-    SET (NEED_LIBNSL TRUE)
-ENDIF (HAVE_GETHOSTBYADDR AND HAVE_GETHOSTBYNAME AND HAVE_INET_ADDR)
 
 IF (DBMS STREQUAL "pgsql")
     #
@@ -186,8 +193,64 @@ ELSEIF (DBMS STREQUAL "drizzle")
             bin/drizzle/dbt2-drizzle-load-db
             bin/drizzle/dbt2-drizzle-start-db
             bin/drizzle/dbt2-drizzle-stop-db)
+
+ELSEIF (DBMS STREQUAL "nuodb")
+    
+    # #########################################################################
+    # NUODB SECTION
+    # #########################################################################
+
+    SET(DB_SCRIPTS bin/nuodb/dbt2-nuodb-load-db
+            bin/nuodb/dbt2-nuodb-start-db
+            bin/nuodb/dbt2-nuodb-stop-db
+            bin/nuodb/dbt2-nuodb-profile)
+
+    FIND_PATH(NUODB_INCLUDE_DIR Connection.h
+        PATHS $ENV{NUODB_INCLUDE_DIR}
+        DOC "NuoDB includes directory")
+
+    IF(NUODB_INCLUDE_DIR)
+        MESSAGE(STATUS "NuoRemote includes directory found: " ${NUODB_INCLUDE_DIR})
+    ELSE(NUODB_INCLUDE_DIR)
+        MESSAGE(WARNING "NuoRemote includes directory not found; please set NUODB_INCLUDE_DIR variable")
+    ENDIF(NUODB_INCLUDE_DIR)
+
+    FIND_LIBRARY(NUOREMOTE_LIBRARY
+        NAMES NuoRemote libNuoRemote
+        PATHS $ENV{NUODB_LIB_DIR}
+        DOC "NuoDB library to link against")
+
+    IF(NUOREMOTE_LIBRARY)
+        MESSAGE(STATUS "NuoRemote library found: " ${NUOREMOTE_LIBRARY})
+    ELSE(NUOREMOTE_LIBRARY)
+        MESSAGE(WARNING "NuoRemote library not found; please set NUODB_LIB_DIR variable")
+    ENDIF(NUOREMOTE_LIBRARY)
+    
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNUODB -I${NUODB_INCLUDE_DIR}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNUODB -I${NUODB_INCLUDE_DIR}")
+
+    SET(DB_LIBS "-L$ENV{NUODB_LIB_DIR} -lNuoRemote")
+    
+    IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        SET(CMAKE_EXE_LINKER_FLAGS "-Xlinker -rpath -Xlinker $ENV{NUODB_LIB_DIR}")
+    ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+    IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+        SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,'$$ORIGIN'")
+    ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+    SET(DB_SOURCE src/nuodb/dbc_common.c
+                  src/nuodb/nuodb_capi.cpp
+                  src/nonsp/dbc_new_order.c
+                  src/nonsp/dbc_payment.c
+                  src/nonsp/dbc_order_status.c
+                  src/nonsp/dbc_delivery.c
+                  src/nonsp/dbc_stock_level.c
+                  src/nonsp/dbc_nonsp.c
+                  src/nonsp/dbc_integrity.c)
+
 ELSE (NOT DEFINED DBMS)
-    MESSAGE(FATAL_ERROR "Need to specify -DDBMS=drizzle|mysql|pgsql|sqlite")
+    MESSAGE(FATAL_ERROR "Need to specify -DDBMS=drizzle|mysql|nuodb|pgsql|sqlite")
 
 ENDIF (DBMS STREQUAL "pgsql")
 
@@ -205,58 +268,58 @@ SET(COMMON_SOURCE src/common.c src/logging.c src/_socket.c
 ADD_EXECUTABLE(${DBT2_CLIENT} src/client.c src/transaction_queue.c
         src/listener.c src/db_threadpool.c src/db.c ${COMMON_SOURCE}
         ${DB_SOURCE})
-IF (NEED_LIBRT)
+
+IF (HAVE_LIBRT)
     TARGET_LINK_LIBRARIES(${DBT2_CLIENT} rt)
-ENDIF (NEED_LIBRT)
-IF (NEED_LIBSOCKET)
+ENDIF (HAVE_LIBRT)
+IF (HAVE_LIBSOCKET)
     TARGET_LINK_LIBRARIES(${DBT2_CLIENT} socket)
-ENDIF (NEED_LIBSOCKET)
-IF (NEED_LIBNSL)
+ENDIF (HAVE_LIBSOCKET)
+IF (HAVE_LIBNSL)
     TARGET_LINK_LIBRARIES(${DBT2_CLIENT} nsl)
-ENDIF (NEED_LIBNSL)
+ENDIF (HAVE_LIBNSL)
 
 ADD_EXECUTABLE(${DBT2_DATAGEN} src/datagen.c src/common.c)
 
 ADD_EXECUTABLE(${DBT2_DRIVER} ${COMMON_SOURCE} src/driver_main.c src/driver.c
         src/input_data_generator.c)
-IF (NEED_LIBRT)
+
+IF (HAVE_LIBRT)
     TARGET_LINK_LIBRARIES(${DBT2_DRIVER} rt)
-ENDIF (NEED_LIBRT)
-IF (NEED_LIBSOCKET)
+ENDIF (HAVE_LIBRT)
+IF (HAVE_LIBSOCKET)
     TARGET_LINK_LIBRARIES(${DBT2_DRIVER} socket)
-ENDIF (NEED_LIBSOCKET)
-IF (NEED_LIBNSL)
+ENDIF (HAVE_LIBSOCKET)
+IF (HAVE_LIBNSL)
     TARGET_LINK_LIBRARIES(${DBT2_DRIVER} nsl)
-ENDIF (NEED_LIBNSL)
+ENDIF (HAVE_LIBNSL)
 
 ADD_EXECUTABLE(${DBT2_TXN_TEST} src/transaction_test.c src/db.c
         src/input_data_generator.c ${COMMON_SOURCE} ${DB_SOURCE})
-IF (NEED_LIBSOCKET)
+
+IF (HAVE_LIBSOCKET)
     TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} socket)
-ENDIF (NEED_LIBSOCKET)
-IF (NEED_LIBNSL)
+ENDIF (HAVE_LIBSOCKET)
+IF (HAVE_LIBNSL)
     TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} nsl)
-ENDIF (NEED_LIBNSL)
+ENDIF (HAVE_LIBNSL)
 
 #
 # Set compiler flags.
 #
 
-SET(CMAKE_C_FLAGS "-g -Wall -Isrc/include ${LFS_CFLAGS}")
-
-SET_SOURCE_FILES_PROPERTIES(src/db_threadpool.c src/db.c src/client.c
-        src/transaction_test.c src/common.c COMPILE_FLAGS "${DBCFLAGS}")
-SET_SOURCE_FILES_PROPERTIES(${DB_SOURCE} COMPILE_FLAGS "${DBCFLAGS}")
+SET(WARNINGS_CFLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter -Wshadow -Wpointer-arith -fno-strict-aliasing -fno-builtin -Wcast-qual -Wcast-align -fstrict-aliasing -Wno-long-long  -Wwrite-strings -O2 -fPIC -m64")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g ${WARNINGS_CFLAGS} -std=c99 -Isrc/include ${LFS_CFLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${WARNINGS_CFLAGS} -Isrc/include ${LFS_CFLAGS}")
 
 #
 # Set linker flags.
 #
 
-SET_TARGET_PROPERTIES(${DBT2_CLIENT} PROPERTIES LINK_FLAGS
-        "-lm ${DB_LIBS} -lpthread")
-SET_TARGET_PROPERTIES(${DBT2_DATAGEN} PROPERTIES LINK_FLAGS -lm)
-SET_TARGET_PROPERTIES(${DBT2_DRIVER} PROPERTIES LINK_FLAGS "-lm -lpthread")
-SET_TARGET_PROPERTIES(${DBT2_TXN_TEST} PROPERTIES LINK_FLAGS "-lm ${DB_LIBS}")
+TARGET_LINK_LIBRARIES(${DBT2_CLIENT} "-lm ${DB_LIBS} -lpthread")
+TARGET_LINK_LIBRARIES(${DBT2_DATAGEN} "-lm")
+TARGET_LINK_LIBRARIES(${DBT2_DRIVER} "-lm -lpthread")
+TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} "-lm ${DB_LIBS}")
 
 #
 # Install rules.
@@ -265,4 +328,5 @@ SET_TARGET_PROPERTIES(${DBT2_TXN_TEST} PROPERTIES LINK_FLAGS "-lm ${DB_LIBS}")
 INSTALL(PROGRAMS ${DBT2_CLIENT} ${DBT2_DATAGEN} ${DBT2_DRIVER} ${DBT2_TXN_TEST}
         bin/dbt2-generate-report bin/dbt2-get-os-info bin/dbt2-post-process
         bin/dbt2-run-workload bin/dbt2-sysstats bin/dbt2-plot-transaction-rate
-        ${DB_SCRIPTS} DESTINATION "/bin")
+        ${DB_SCRIPTS} DESTINATION bin)
+

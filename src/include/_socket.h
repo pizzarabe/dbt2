@@ -26,8 +26,8 @@
 
 int _accept(int *s);
 int _connect(char *address, unsigned short port);
-int _receive(int s, void *data, int length);
-int _send(int s, void *data, int length);
+int _receive(int s, void *data, size_t length);
+int _send(int s, void *data, size_t length);
 int _listen(int port);
 
 #endif /* __SOCKET_H_ */

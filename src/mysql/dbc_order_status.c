@@ -6,8 +6,8 @@
  * Copyright (C) 2004 Alexey Stroganov & MySQL AB.
  *
  */
-      
-       
+
+
 #include "common.h"
 #include "logging.h"
 #include "mysql_order_status.h"
@@ -16,21 +16,21 @@
 
 int execute_order_status(struct db_context_t *dbc, struct order_status_t *data)
 {
-	char stmt[128];
+    char stmt[128];
 
-	/* Create the query and execute it. */
-	sprintf(stmt, "call order_status(%d, %d, %d, '%s')",
-		data->c_id, data->c_w_id, data->c_d_id, data->c_last);
+    /* Create the query and execute it. */
+    sprintf(stmt, "call order_status(%d, %d, %d, '%s')",
+            data->c_id, data->c_w_id, data->c_d_id, data->c_last);
 
 #ifdef DEBUG_QUERY
-        LOG_ERROR_MESSAGE("execute_order_status stmt: %s\n", stmt);
+    LOG_ERROR_MESSAGE("execute_order_status stmt: %s\n", stmt);
 #endif
-        if (mysql_query(dbc->mysql, stmt))
-        {
-          LOG_ERROR_MESSAGE("mysql reports: SQL STMT %s ERROR: %d %s", stmt,  mysql_errno(dbc->mysql) ,
-                            mysql_error(dbc->mysql));
-          return ERROR;
-        }
-	return OK;
+    if (mysql_query(dbc->mysql, stmt))
+    {
+        LOG_ERROR_MESSAGE("mysql reports: SQL STMT %s ERROR: %d %s", stmt,  mysql_errno(dbc->mysql) ,
+                          mysql_error(dbc->mysql));
+        return ERROR;
+    }
+    return OK;
 }
 

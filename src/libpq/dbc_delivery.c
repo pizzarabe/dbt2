@@ -15,29 +15,29 @@
 
 int execute_delivery(struct db_context_t *dbc, struct delivery_t *data)
 {
-	PGresult *res;
-	char stmt[128];
+    PGresult *res;
+    char stmt[128];
 
-	/* Start a transaction block. */
-	res = PQexec(dbc->conn, "BEGIN");
-	if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
-		LOG_ERROR_MESSAGE("%s", PQerrorMessage(dbc->conn));
-		PQclear(res);
-		return ERROR;
-	}
-	PQclear(res);
+    /* Start a transaction block. */
+    res = PQexec(dbc->conn, "BEGIN");
+    if (!res || PQresultStatus(res) != PGRES_COMMAND_OK) {
+        LOG_ERROR_MESSAGE("%s", PQerrorMessage(dbc->conn));
+        PQclear(res);
+        return ERROR;
+    }
+    PQclear(res);
 
-	/* Create the query and execute it. */
-	sprintf(stmt, "SELECT delivery(%d, %d)",
-		data->w_id, data->o_carrier_id);
-	res = PQexec(dbc->conn, stmt);
-	if (!res || (PQresultStatus(res) != PGRES_COMMAND_OK &&
-		PQresultStatus(res) != PGRES_TUPLES_OK)) {
-		LOG_ERROR_MESSAGE("%s", PQerrorMessage(dbc->conn));
-		PQclear(res);
-		return ERROR;
-	}
-	PQclear(res);
+    /* Create the query and execute it. */
+    sprintf(stmt, "SELECT delivery(%d, %d)",
+            data->w_id, data->o_carrier_id);
+    res = PQexec(dbc->conn, stmt);
+    if (!res || (PQresultStatus(res) != PGRES_COMMAND_OK &&
+                 PQresultStatus(res) != PGRES_TUPLES_OK)) {
+        LOG_ERROR_MESSAGE("%s", PQerrorMessage(dbc->conn));
+        PQclear(res);
+        return ERROR;
+    }
+    PQclear(res);
 
-	return OK;
+    return OK;
 }

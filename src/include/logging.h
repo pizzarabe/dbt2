@@ -13,10 +13,10 @@
 #define _LOGGING_H_
 
 #define ERROR_LOG_NAME "error.log"
-#define LOG_ERROR_MESSAGE(arg...) log_error_message(__FILE__, __LINE__, ## arg)
+#define LOG_ERROR_MESSAGE(...) log_error_message(__FILE__, __LINE__, ## __VA_ARGS__)
 
 int edump(int type, void *data);
 int init_logging();
-int log_error_message(char *filename, int line, const char *fmt, ...);
+int log_error_message(char const * filename, int line, const char * fmt, ...);
 
 #endif /* _LOGGING_H_ */

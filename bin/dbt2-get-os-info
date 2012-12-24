@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # This file is released under the terms of the Artistic License.
@@ -17,7 +17,12 @@ done
 
 OS=`uname -s`
 
+if [ "x${OS}" = "xDarwin" ]; then
+SYSCTL="/usr/sbin/sysctl"
+else
 SYSCTL="/sbin/sysctl"
+fi
+
 if [ ! -f "${SYSCTL}" ]; then
 	SYSCTL=true
 fi
@@ -27,6 +32,9 @@ if [ -f ${SYSCTL} ]; then
 	if [ "x${OS}" = "xLinux" ]; then
 		${SYSCTL} -a 2> /dev/null | sort > ${OUTPUT_DIR}/proc.out
 	elif [ "x${OS}" = "xSunOS" ]; then
+		${SYSCTL} -a 2> /dev/null | sort > ${OUTPUT_DIR}/proc.out
+	elif [ "x${OS}" = "xDarwin" ]; then
+	    /usr/sbin/sysctl -a 2> /dev/null | sort > $OUTPUT_DIR/proc.out
 		${SYSCTL} -a 2> /dev/null | sort > ${OUTPUT_DIR}/proc.out
 	else
 		echo "Unknown OS: ${OS}"

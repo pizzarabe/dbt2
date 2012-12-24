@@ -1,3 +1,8 @@
+v0.42
+
+- Add support for NuoDB.
+- Fix boatloads of compilation, linking, build system, errors and warnings.
+
 v0.41
 
 - Renamed the 'scripts' directory to 'bin'.

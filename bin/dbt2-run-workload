@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # This file is released under the terms of the Artistic License.
@@ -226,9 +226,12 @@ usage()
 	fi
 	echo
 	echo "usage: `basename $0` -h"
-	echo "usage: `basename $0` -a <drizzle|mysql|pgsql|sqlite>"
-	echo "       -c <number of database connections> -d <seconds>"
-	echo "       -w <number of warehouses> -o <path> [options]"
+	echo "usage: `basename $0` -a <drizzle|mysql|nuodb|pgsql|sqlite>"
+	echo "       -c <number of database connections>"
+    echo "       -d <duration seconds>"
+	echo "       -w <number of warehouses>"
+    echo "       -o <path>"
+    echo "       [options]"
 	echo "options:"
 	echo "       -H <database host name. (default localhost)>"
 	if [ "${DBMS}" = "drizzle" ]; then
@@ -259,6 +262,7 @@ validate_parameter()
 	fi
 }
 
+DBNAME=dbt2
 DB_HOSTNAME="localhost"
 DB_PASSWORD=""
 CLIENT_HOSTNAME="localhost"
@@ -486,7 +490,7 @@ fi
 echo "DBT-2 test for ${DBMS} started..."
 echo ""
 echo "DATABASE SYSTEM: ${DB_HOSTNAME}"
-if [ "${DBMS}" = "pgsql" ] || [ "${DBMS}" = "mysql" ] || [ "${DBMS}" = "drizzle" ]; then
+if [ "${DBMS}" = "pgsql" ] || [ "${DBMS}" = "mysql" ] || [ "${DBMS}" = "drizzle" ] || [ "${DBMS}" = "nuodb" ]; then
 	echo "DATABASE NAME: ${DBNAME}"
 fi
 
@@ -541,6 +545,8 @@ elif [ ${DBMS} = "mysql" ]; then
 	CLIENT_COMMAND_ARGS="${CLIENT_COMMAND_ARGS} -d ${DBNAME}"
 	CLIENT_COMMAND_ARGS="${CLIENT_COMMAND_ARGS} ${SOCK_FILE_ARG} -u root"
 	CLIENT_COMMAND_ARGS="${CLIENT_COMMAND_ARGS} -h ${DB_HOSTNAME}"
+elif [ ${DBMS} = "nuodb" ]; then
+	CLIENT_COMMAND_ARGS="${CLIENT_COMMAND_ARGS} -d ${DBNAME}"
 elif [ ${DBMS} = "sqlite" ]; then
 	CLIENT_COMMAND_ARGS="${CLIENT_COMMAND_ARGS} -d ${DB_PARAMS}"
 elif [ ${DBMS} = "drizzle" ]; then

@@ -11,64 +11,64 @@
 
 int execute_integrity(struct db_context_t *dbc, struct integrity_t *data)
 {
-        int rc;
-        char *  vals[1];
-        int nvals=1;
+    int rc;
+    char *  vals[1];
+    int nvals=1;
 
-        rc=integrity(dbc, data, vals, nvals);
+    rc=integrity(dbc, data, vals, nvals);
 
-        if (rc == -1 )
-        {
-          LOG_ERROR_MESSAGE("TEST FINISHED WITH ERRORS \n");
+    if (rc == -1 )
+    {
+        LOG_ERROR_MESSAGE("TEST FINISHED WITH ERRORS \n");
 
-          //should free memory that was allocated for nvals vars
-          dbt2_free_values(vals, nvals);
+        //should free memory that was allocated for nvals vars
+        dbt2_free_values(vals, nvals);
 
-          return ERROR;
-        }
-        return OK;
+        return ERROR;
+    }
+    return OK;
 }
 
 int integrity(struct db_context_t *dbc, struct integrity_t *data, char ** vals, int nvals)
 {
-	/* Input variables. */
-	int w_id = data->w_id;
+    /* Input variables. */
+    int w_id = data->w_id;
 
-        struct sql_result_t result;
-	char query[256];
-        int W_ID=0;
- 
-        dbt2_init_values(vals, nvals);
+    struct sql_result_t result;
+    char query[256];
+    int W_ID=0;
 
-	sprintf(query, INTEGRITY_1);
+    dbt2_init_values(vals, nvals);
+
+    sprintf(query, INTEGRITY_1);
 
 #ifdef DEBUG_QUERY
-        LOG_ERROR_MESSAGE("INTEGRITY_1 query: %s\n",query);
+    LOG_ERROR_MESSAGE("INTEGRITY_1 query: %s\n",query);
 #endif
-        if (dbt2_sql_execute(dbc, query, &result, "INTEGRITY_1") && result.result_set)
-        {
-          dbt2_sql_fetchrow(dbc, &result);
-          vals[W_ID] = dbt2_sql_getvalue(dbc, &result, 0); //W_ID
-          dbt2_sql_close_cursor(dbc, &result);
+    if (dbt2_sql_execute(dbc, query, &result, "INTEGRITY_1") && result.result_set)
+    {
+        dbt2_sql_fetchrow(dbc, &result);
+        vals[W_ID] = dbt2_sql_getvalue(dbc, &result, 0); //W_ID
+        dbt2_sql_close_cursor(dbc, &result);
 
-          if (!vals[W_ID])
-          {
+        if (!vals[W_ID])
+        {
             LOG_ERROR_MESSAGE("ERROR: W_ID is NULL for query INTEGRITY_1:\n%s\n", query);
             return -1;
-          }
+        }
 
-          if (atoi(vals[W_ID]) != w_id)
-          {
+        if (atoi(vals[W_ID]) != w_id)
+        {
             LOG_ERROR_MESSAGE("ERROR: Expect W_ID = %d Got W_ID = %d", w_id, atoi(vals[W_ID]));
             return -1;
-          }
         }
-        else //error
-        {
-          return -1;
-        }
+    }
+    else //error
+    {
+        return -1;
+    }
 
-        dbt2_free_values(vals, nvals);
+    dbt2_free_values(vals, nvals);
 
-        return 1;
+    return 1;
 }

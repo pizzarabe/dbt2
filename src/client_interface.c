@@ -14,48 +14,48 @@
 
 int connect_to_client(char *addr, int port)
 {
-	int sockfd;
+    int sockfd;
 
-	sockfd = _connect(addr, port);
+    sockfd = _connect(addr, port);
 
-	return sockfd;
+    return sockfd;
 }
 
 int receive_transaction_data(int s, struct client_transaction_t *client_data)
 {
-	int length;
+    int length;
 
-	length = _receive(s, client_data, sizeof(struct client_transaction_t));
-	if (length == -1) {
-		LOG_ERROR_MESSAGE("cannot receive interaction data");
-		return ERROR;
-	} else if (length == 0) {
-		LOG_ERROR_MESSAGE("socket closed on _receive");
-		return ERROR_SOCKET_CLOSED;
-	} else if (length != sizeof(struct client_transaction_t)) {
-		LOG_ERROR_MESSAGE("did not receive all data");
-		return ERROR;
-	}
+    length = _receive(s, client_data, sizeof(struct client_transaction_t));
+    if (length == -1) {
+        LOG_ERROR_MESSAGE("cannot receive interaction data");
+        return ERROR;
+    } else if (length == 0) {
+        LOG_ERROR_MESSAGE("socket closed on _receive");
+        return ERROR_SOCKET_CLOSED;
+    } else if (length != sizeof(struct client_transaction_t)) {
+        LOG_ERROR_MESSAGE("did not receive all data");
+        return ERROR;
+    }
 
-	return length;
+    return length;
 }
 
 int send_transaction_data(int s, struct client_transaction_t *client_data)
 {
-	int length;
+    int length;
 
-	length = _send(s, (void *) client_data,
-		sizeof(struct client_transaction_t));
-	if (length == -1) {
-		LOG_ERROR_MESSAGE("cannot send transaction data");
-		return ERROR;
-	} else if (length == 0) {
-		LOG_ERROR_MESSAGE("socket closed on _send");
-		return ERROR_SOCKET_CLOSED;
-	} else if (length != sizeof(struct client_transaction_t)) {
-		LOG_ERROR_MESSAGE("did not send all data");
-		return ERROR;
-	}
+    length = _send(s, (void *) client_data,
+                   sizeof(struct client_transaction_t));
+    if (length == -1) {
+        LOG_ERROR_MESSAGE("cannot send transaction data");
+        return ERROR;
+    } else if (length == 0) {
+        LOG_ERROR_MESSAGE("socket closed on _send");
+        return ERROR_SOCKET_CLOSED;
+    } else if (length != sizeof(struct client_transaction_t)) {
+        LOG_ERROR_MESSAGE("did not send all data");
+        return ERROR;
+    }
 
-	return length;
+    return length;
 }

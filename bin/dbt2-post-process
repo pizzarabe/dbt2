@@ -10,9 +10,8 @@
 
 import sys
 import os
-
 import rpy2.robjects as robjects
-from rpy2.robjects.vectors import DataFrame
+from rpy2.robjects import DataFrame
 
 if len(sys.argv) != 2:
     print 'usage: %s <mix.log>' % sys.argv[0]
@@ -37,6 +36,7 @@ per90 = dict()
 average_rt = dict()
 
 r = robjects.r
+
 df = DataFrame.from_csvfile(filename, header=False)
 rampup_start = df[0][0]
 
@@ -56,10 +56,13 @@ total_transaction_count = steadystate.nrow
 for key in [d, n, o, p, s]:
     dataframe[key] = r.subset(steadystate, steadystate.rx('V2').ro == key)
     transaction_count[key] = dataframe[key].nrow
-    rollback_count[key] = r.subset(dataframe[key],
-                                   dataframe[key].rx('V3').ro == "R").nrow
+    if transaction_count[key] > 0:
+        rollback_count[key] = r.subset(dataframe[key],
+            dataframe[key].rx('V3').ro == "R").nrow
+    else:
+        rollback_count[key] = 0
     per90[key] = r.quantile(dataframe[key].rx('V4')[0], .9)[0]
-    average_rt[key] = r.mean(dataframe[key].rx('V4'))[0]
+    average_rt[key] = r.colMeans(dataframe[key].rx('V4'))[0]
 
 transaction_name = dict()
 transaction_name[d] = 'Delivery'
@@ -74,33 +77,33 @@ print '------------  -----  ---------------------  -----------  --------------- 
 
 for key in [d, n, o, p, s]:
     try:
-        mix_percentage = float(transaction_count[key]) / \
-                float(total_transaction_count) * 100.0
-    except:
+        mix_percentage = float(transaction_count[key]) /\
+                         float(total_transaction_count) * 100.0
+    except ZeroDivisionError:
         mix_percentage = 0
 
     try:
-        rollback_percentage = float(rollback_count[key]) / \
-                float(transaction_count[key]) * 100.0
-    except:
+        rollback_percentage = float(rollback_count[key]) /\
+                              float(transaction_count[key]) * 100.0
+    except ZeroDivisionError:
         rollback_percentage = 0
 
     print '%12s  %5.2f  %9.3f : %9.3f  %11d  %15d  %5.2f' % (
-            transaction_name[key],
-            mix_percentage,
-            average_rt[key],
-            per90[key],
-            transaction_count[key],
-            rollback_count[key],
-            rollback_percentage)
+        transaction_name[key],
+        mix_percentage,
+        average_rt[key],
+        per90[key],
+        transaction_count[key],
+        rollback_count[key],
+        rollback_percentage)
 
 print '------------  -----  ---------------------  -----------  ---------------  -----'
 
 duration = float(steadystate_end - steadystate_start)
 print
-print '%0.2f new-order transactions per minute (NOTPM)' % \
-        (float(transaction_count[n]) * 60.0 / duration)
+print '%0.2f new-order transactions per minute (NOTPM)' %\
+      (float(transaction_count[n]) * 60.0 / duration)
 print '%0.1f minute duration' % (duration / 60.0)
 print '%d total unknown errors' % error_count
-print '%0.1f seconds(s) ramping up' % \
+print '%0.1f seconds(s) ramping up' %\
       (float(steadystate_start - rampup_start) / 60.0)

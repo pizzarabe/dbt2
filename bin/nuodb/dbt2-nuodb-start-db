@@ -57,7 +57,7 @@ function startte()
 {
     echo "[INFO] Starting transaction engine" | tee -a ${LOG_FILE}
     TE_ARGS="--dba-user ${DB_USER} --dba-password ${DB_PASSWORD} ${ENGINE_ARGS}"
-    ${NUODB_MANAGER} "start process te host ${DB_HOST} database ${DB_NAME} options '${TE_ARGS}'" | tee -a ${LOG_FILE}
+    ${NUODB_MANAGER} "start process te host ${DB_HOST}:${DB_PORT} database ${DB_NAME} options '${TE_ARGS}'" | tee -a ${LOG_FILE}
     sleep 1
 }
 
@@ -71,9 +71,9 @@ function startsm()
     if [ $FORCE -eq 1 ]; then
         rm -fr ${DB_DATA}
         mkdir -p ${DB_DATA}
-        ${NUODB_MANAGER} "start process sm archive ${DB_DATA}/${DB_NAME} host ${DB_HOST} database ${DB_NAME} initialize yes options '${SM_ARGS}'" | tee -a ${LOG_FILE}
+        ${NUODB_MANAGER} "start process sm archive ${DB_DATA}/${DB_NAME} host ${DB_HOST}:${DB_PORT} database ${DB_NAME} initialize yes options '${SM_ARGS}'" | tee -a ${LOG_FILE}
     else
-        ${NUODB_MANAGER} "start process sm archive ${DB_DATA}/${DB_NAME} host ${DB_HOST} database ${DB_NAME} options '${SM_ARGS}'" | tee -a ${LOG_FILE}
+        ${NUODB_MANAGER} "start process sm archive ${DB_DATA}/${DB_NAME} host ${DB_HOST}:${DB_PORT} database ${DB_NAME} options '${SM_ARGS}'" | tee -a ${LOG_FILE}
     fi
     sleep 2
 }

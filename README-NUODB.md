@@ -46,6 +46,12 @@ To create a redistributable package:
 ```bash
 make package
 ```
+## Before Proceeding
+
+Modify the bin/nuodb/dbt2-nuodb-profile file so that your NuoDB installation
+location is properly identified:
+
+>       : ${NUODB_ROOT:="/home/rbuck/tmp/nuodb"}
 
 ## Generate and Load Data
 In order to test you have to generate data files which are imported into NuoDB
@@ -76,14 +82,14 @@ dbt2-run-workload -c <number of database connections> -d <duration of test> -w <
 
 Other options:
 
->	    -c #  -  Set the number of database connections.
+>       -c #  -  Set the number of database connections.
 >       -d <database name. (default dbt2)>
 >       -h <database host name. (default localhost)>
 >       -l <database port number>
 >       -o <enable oprofile data collection>
 >       -s <delay of starting of new threads in milliseconds>
 >       -n <no thinking or keying time (default no)>
->	    -w #  -  Set the warehouse scale factor.
+>       -w #  -  Set the warehouse scale factor.
 >       -z <comments for the test>
 
 Example: dbt2-run-workload -c 20 -d 100 -w 1 -s 100 -o /var/tmp/results-1

@@ -436,7 +436,7 @@ void *terminal_worker(void *data)
     int local_seed;
     pid_t pid;
     pthread_t tid;
-    char code;
+    char code = 0;
 
 #ifdef STANDALONE
     struct db_context_t dbc;

@@ -93,7 +93,7 @@ IF (DBMS STREQUAL "pgsql")
                 PG_INCLUDEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
         EXECUTE_PROCESS(COMMAND ${PG_CONFIG} --libdir OUTPUT_VARIABLE
                 PG_LIBDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-        SET(DBCFLAGS "-DLIBPQ -I${PG_INCLUDEDIR}")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLIBPQ -I${PG_INCLUDEDIR}")
         SET(DB_LIBS "-L${PG_LIBDIR} -lpq")
         SET(DB_SCRIPTS bin/pgsql/dbt2-pgsql-build-db
                 bin/pgsql/dbt2-pgsql-check-db
@@ -151,10 +151,10 @@ ELSEIF (DBMS STREQUAL "mysql")
                 src/mysql/dbc_delivery.c src/mysql/dbc_stock_level.c
                 src/mysql/dbc_integrity.c)
         EXECUTE_PROCESS(COMMAND ${MYSQL_CONFIG} --include OUTPUT_VARIABLE
-                MYSQL_INCLUDEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+                MYSQL_INCLUDE_CFLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
         EXECUTE_PROCESS(COMMAND ${MYSQL_CONFIG} --libs OUTPUT_VARIABLE
                 DB_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
-        SET(DBCFLAGS "-DLIBMYSQL ${MYSQL_INCLUDEDIR}")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLIBMYSQL ${MYSQL_INCLUDE_CFLAGS}")
         SET(DB_SCRIPTS
                 bin/mysql/dbt2-mysql-build-db
                 bin/mysql/dbt2-mysql-load-stored-procs
@@ -319,7 +319,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${WARNINGS_CFLAGS} -Isrc/include ${LF
 TARGET_LINK_LIBRARIES(${DBT2_CLIENT} "-lm ${DB_LIBS} -lpthread")
 TARGET_LINK_LIBRARIES(${DBT2_DATAGEN} "-lm")
 TARGET_LINK_LIBRARIES(${DBT2_DRIVER} "-lm -lpthread")
-TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} "-lm ${DB_LIBS}")
+TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} "-lm ${DB_LIBS} -lpthread")
 
 #
 # Install rules.

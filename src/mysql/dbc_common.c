@@ -170,7 +170,7 @@ int dbt2_sql_close_cursor(struct db_context_t *dbc, struct sql_result_t * sql_re
 }
 
 
-char * dbt2_sql_getvalue(struct db_context_t *dbc, struct sql_result_t * sql_result, int field)
+char * dbt2_sql_getvalue(struct db_context_t *dbc, struct sql_result_t * sql_result, unsigned int field)
 {
     char * tmp;
 

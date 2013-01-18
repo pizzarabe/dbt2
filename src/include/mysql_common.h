@@ -26,7 +26,7 @@ struct sql_result_t
 #define HAVE_SQL_RESULT_NUM_ROWS
   unsigned int num_rows;
   unsigned long * lengths;
-  char * query;
+  char const * query;
 };
 
 extern char mysql_dbname[32];
@@ -43,12 +43,12 @@ int _db_init(char *_mysql_dbname, char *_mysql_host, char * _mysql_user, char * 
              char *_mysql_port, char * _mysql_socket);
 int rollback_transaction(struct db_context_t *dbc);
 
-int dbt2_sql_execute(struct db_context_t *dbc, char * query,
-                     struct sql_result_t * sql_result, char * query_name);
+int dbt2_sql_execute(struct db_context_t *dbc, char const * query,
+                     struct sql_result_t * sql_result, char const * query_name);
 int dbt2_sql_close_cursor(struct db_context_t *dbc, struct sql_result_t * sql_result);
 int dbt2_sql_fetchrow(struct db_context_t *dbc, struct sql_result_t * sql_result);
 char * dbt2_sql_getvalue(struct db_context_t *dbc, struct sql_result_t * sql_result,
-                         int field);
+                         unsigned int field);
 
 #endif /* _MYSQL_COMMON_H_ */
 

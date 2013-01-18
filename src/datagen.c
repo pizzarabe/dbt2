@@ -124,7 +124,7 @@ void print_timestamp(FILE *ofile, struct tm *date)
 /* Clause 4.3.3.1 */
 void gen_customers()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i, j, k;
     char a_string[2048];
     struct tm *tm1;
@@ -317,7 +317,7 @@ void gen_customers()
 /* Clause 4.3.3.1 */
 void gen_districts()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i, j;
     char a_string[48];
     char filename[1024] = "\0";
@@ -446,7 +446,7 @@ void gen_districts()
 /* Clause 4.3.3.1 */
 void gen_history()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i, j, k;
     char a_string[64];
     struct tm *tm1;
@@ -566,7 +566,7 @@ void gen_history()
 /* Clause 4.3.3.1 */
 void gen_items()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i;
     char a_string[128];
     int j;
@@ -668,7 +668,7 @@ void gen_items()
 /* Clause 4.3.3.1 */
 void gen_new_orders()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i, j, k;
     char filename[1024] = "\0";
 
@@ -756,7 +756,7 @@ void gen_new_orders()
 /* Clause 4.3.3.1 */
 void gen_orders()
 {
-    FILE *order, *order_line;
+    FILE *order = NULL, *order_line = NULL;
     int i, j, k, l;
     char a_string[64];
     struct tm *tm1;
@@ -1056,7 +1056,7 @@ void gen_orders()
 /* Clause 4.3.3.1 */
 void gen_stock()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i, j, k;
     char a_string[128];
     char filename[1024] = "\0";
@@ -1215,7 +1215,7 @@ void gen_stock()
 /* Clause 4.3.3.1 */
 void gen_warehouses()
 {
-    FILE *output;
+    FILE *output = NULL;
     int i;
     char a_string[48];
     char filename[1024] = "\0";

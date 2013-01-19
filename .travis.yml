@@ -25,7 +25,7 @@ install:
 
 script:
   - cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/dbt -DCMAKE_BUILD_TYPE=Debug
-  - make package install
+  - sudo make package install
 
 after_script:
   - sudo dpkg -r nuodb

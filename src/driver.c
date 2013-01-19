@@ -155,7 +155,7 @@ int integrity_terminal_worker()
                         &client_data.transaction_data, table_cardinality.warehouses);
 
 #ifdef DEBUG
-    printf("executing transaction %c\n"
+    printf("executing transaction %c\n",
            transaction_short_name[client_data.transaction]);
     fflush(stdout);
 

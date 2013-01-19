@@ -66,6 +66,11 @@ extern char dbt2_mysql_host[128];
 extern char dbt2_mysql_socket[256];
 #endif /* LIBMYSQL */
 
+#ifdef NUODB
+extern char dbt2_nuodb_host[128];
+extern char dbt2_nuodb_port[32];
+#endif /* NUODB */
+
 #ifdef LIBDRIZZLE
 extern char dbt2_drizzle_port[32];
 extern char dbt2_drizzle_host[128];
@@ -101,7 +106,9 @@ void *db_worker(void *data)
 
 #ifdef NUODB
     printf("connect to NUODB server with parameters: database: |%s| user: |%s| pass: |%s| timezone: |%s| schema: |%s|\n", DB_NAME, DB_USER, DB_PASS, "UTC", DB_NAME);
-    db_init(DB_NAME, DB_USER, DB_PASS, "UTC", DB_NAME);
+    char dbt2_nuodb_conn_str[256] = {0};
+    sprintf(dbt2_nuodb_conn_str, "%s@%s:%s", sname, dbt2_nuodb_host, dbt2_nuodb_port);
+    db_init(dbt2_nuodb_conn_str, dbt2_user, dbt2_pass, "UTC", sname);
 #endif /* NUODB */
 
 #ifdef LIBDRIZZLE

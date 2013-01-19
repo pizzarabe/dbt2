@@ -25,20 +25,20 @@ The build procedure is simple:
 ```bash
 export NUODB_INCLUDE_DIR=/Users/rbuck/tmp/nuodb/include
 export NUODB_LIB_DIR=/Users/rbuck/tmp/nuodb/lib64
-cmake -G "Unix Makefiles" -DDBMS=nuodb
+cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/dbt -DCMAKE_BUILD_TYPE=Debug
 make
 ```
 
-If you want to use `make install`, then set your prefix in above:
+If you want to use `make install`, then set your prefix too:
 
 ```bash
-cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/dbt
+cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/dbt -DCMAKE_BUILD_TYPE=Debug
 ```
 
 To install it locally:
 
 ```bash
-make install DESTDIR=/usr/local
+make install
 ```
 
 To create a redistributable package:

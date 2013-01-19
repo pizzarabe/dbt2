@@ -308,9 +308,17 @@ ENDIF (HAVE_LIBNSL)
 # Set compiler flags.
 #
 
-SET(WARNINGS_CFLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter -Wshadow -Wpointer-arith -fno-strict-aliasing -fno-builtin -Wcast-qual -Wcast-align -fstrict-aliasing -Wno-long-long  -Wwrite-strings -O2 -fPIC -m64")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g ${WARNINGS_CFLAGS} -std=c99 -Isrc/include ${LFS_CFLAGS}")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${WARNINGS_CFLAGS} -Isrc/include ${LFS_CFLAGS}")
+SET(WARNINGS_CFLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter -Wshadow -Wpointer-arith -fno-strict-aliasing -fno-builtin -Wcast-qual -Wcast-align -fstrict-aliasing -Wno-long-long  -Wwrite-strings -fPIC -m64")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGS_CFLAGS} -std=c99 -Isrc/include ${LFS_CFLAGS}")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS_CFLAGS} -Isrc/include ${LFS_CFLAGS}")
+
+SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG=1 -ggdb")
+SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNDEBUG=1")
+SET(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -DNDEBUG=1 -ggdb")
+
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1 -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -DNDEBUG=1 -ggdb")
 
 #
 # Set linker flags.

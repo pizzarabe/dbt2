@@ -4,7 +4,7 @@
 #include "logging.h"
 #include "nuodb_common.h"
 
-char _database[128] = {0};
+char _database[256] = {0};
 char _username[32] = {0};
 char _password[32] = {0};
 char _timezone[32] = {0};

@@ -54,6 +54,11 @@ char dbt2_mysql_port[32];
 char dbt2_mysql_socket[256];
 #endif /* LIBMYSQL */
 
+#ifdef NUODB
+char dbt2_nuodb_host[128];
+char dbt2_nuodb_port[32] = "48004";
+#endif /* NUODB */
+
 #ifdef LIBDRIZZLE
 char dbt2_drizzle_host[128];
 char dbt2_drizzle_port[32];
@@ -79,7 +84,7 @@ int main(int argc, char *argv[])
         printf("-p #\n");
         printf("\tport to listen for incoming connections, default %d\n",
                CLIENT_PORT);
-#if defined(ODBC) || defined(NUODB)
+#if defined(ODBC)
         printf("-d <db_name>\n");
         printf("\tdatabase connect string\n");
 #endif /* ODBC */
@@ -89,6 +94,14 @@ int main(int argc, char *argv[])
         printf("-l #\n");
         printf("\tpostmaster port\n");
 #endif /* LIBPQ */
+#ifdef NUODB
+        printf("-h <hostname of nuodb server>\n");
+        printf("\tname of host where nuodb server is running\n");
+        printf("-d <db_name>\n");
+        printf("\tdatabase name\n");
+        printf("-l #\n");
+        printf("\tport number to use for connection to nuodb server\n");
+#endif /* NUODB */
 #ifdef LIBMYSQL
         printf("-h <hostname of mysql server>\n");
         printf("\tname of host where mysql server is running\n");
@@ -223,6 +236,9 @@ int parse_arguments(int argc, char *argv[])
 #if defined(LIBMYSQL)
             strcpy(dbt2_mysql_port, optarg);
 #endif
+#if defined(NUODB)
+            strcpy(dbt2_nuodb_port, optarg);
+#endif
 #if defined(LIBDRIZZLE)
             strcpy(dbt2_drizzle_port, optarg);
 #endif
@@ -231,6 +247,9 @@ int parse_arguments(int argc, char *argv[])
         case 'h':
 #if defined(LIBMYSQL)
             strcpy(dbt2_mysql_host, optarg);
+#endif
+#if defined(NUODB)
+            strcpy(dbt2_nuodb_host, optarg);
 #endif
 #if defined(LIBDRIZZLE)
             strcpy(dbt2_drizzle_host, optarg);

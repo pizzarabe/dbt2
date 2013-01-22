@@ -57,15 +57,16 @@ steadystate = False
 with closing(open(filename, 'r')) as mix_file:
     for line in mix_file:
         vars = line.split(',')
+        V1_timestamp = int(vars[0])
+        if len(vars) < 2 or vars[1] == 'TERMINATED':
+            continue
+        else:
+            V2_txkey = vars[1]
         if len(vars) != 5:
             print 'Result mix file, invalid line: %s' % line
             continue
-        V1_timestamp = int(vars[0])
-        V2_txkey = vars[1]
 
         if steadystate:
-            if V2_txkey == 'TERMINATED':
-                continue
             V3_txresult = vars[2]
             if V2_txkey not in transaction_name:
                 print 'Invalid transaction key, ignoring line: %s' % line
@@ -94,7 +95,7 @@ with closing(open(filename, 'r')) as mix_file:
                 steadystate_start = V1_timestamp
                 continue
             elif rampup_start == 0:
-                steadystate_start = V1_timestamp
+                rampup_start = V1_timestamp
                 continue
 
 if steadystate_start<= rampup_start:

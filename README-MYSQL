@@ -85,19 +85,20 @@ NOTE:
 
 3. How to load SP procedures?
 
-   dbt2-mysql-load-stored-procs
+   dbt2-mysql-load-sp
 
    usage: dbt2-mysql-load-sp [options]
    options:
        -d <database name>
+       -c <path to mysql client binary (default: /usr/bin/mysql)>
        -f <path to SPs>
        -h <database host (default: localhost)>
+       -p <database port>
        -s <database socket>
        -u <database user>
-       -p <database password>
-       -t <database port>
+       -x <database password>
 
-   Example: dbt2-mysql-load-stored-procs -d dbt2 -f ~/src/dbt2/storedproc/mysql/ -s /tmp/mysql.sock
+   Example: dbt2-mysql-load-sp -d dbt2 -f ~/src/dbt2/storedproc/mysql/ -s /tmp/mysql.sock
 
 RUN TEST
 --------

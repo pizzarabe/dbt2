@@ -14,10 +14,10 @@ usage() {
   echo '       -c <path to mysql client binary. (default: /usr/bin/mysql)>'
   echo '       -f <path to SPs>'
   echo '       -h <database host (default: localhost>'
+  echo '       -p <database port>'
   echo '       -s <database socket>'
   echo '       -u <database user'
-  echo '       -p <database port>'
-  echo '       -t <database port>'
+  echo '       -x password'
   echo '       -v <verbose>'
   echo ''
   echo 'Example: sh mysql_load_sp.sh -d dbt2'
@@ -71,7 +71,7 @@ DB_USER=$USER
 DB_PORT="3306"
 PATH_SP=../../storedproc/mysql
 
-while getopts "t:f:d:c:s:h:u:p:v" opt; do
+while getopts "t:f:d:c:s:h:u:p:v:x" opt; do
         case $opt in
         p)
                 DB_PORT=$OPTARG
@@ -94,7 +94,7 @@ while getopts "t:f:d:c:s:h:u:p:v" opt; do
         u)
                 DB_USER=$OPTARG
                 ;;
-        p)
+        x)
                 DB_PASSWORD=$OPTARG
                 ;;
         v)

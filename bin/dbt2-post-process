@@ -95,7 +95,7 @@ with closing(open(filename, 'r')) as mix_file:
                 steadystate_start = V1_timestamp
                 continue
             elif rampup_start == 0:
-                steadystate_start = V1_timestamp
+                rampup_start = V1_timestamp
                 continue
 
 if steadystate_start<= rampup_start:

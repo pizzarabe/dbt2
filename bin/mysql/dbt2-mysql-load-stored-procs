@@ -1,4 +1,5 @@
 #!/bin/bash
+# Deprecated:  see dbt2-mysql-load-sp
 
 usage() {
 
@@ -14,10 +15,9 @@ usage() {
   echo '       -c <path to mysql client binary. (default: /usr/bin/mysql)>'
   echo '       -f <path to SPs>'
   echo '       -h <database host (default: localhost>'
+  echo '       -p <database port>'
   echo '       -s <database socket>'
   echo '       -u <database user'
-  echo '       -p <database port>'
-  echo '       -t <database port>'
   echo '       -x <password>'
   echo '       -v <verbose>'
   echo ''

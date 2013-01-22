@@ -6,7 +6,7 @@ bin_dir=`cd "${self_dir}"; pwd`
 top_dir=`cd "${self_dir}"/..; pwd`
 unset self_dir
 
-source ${top_dir}/bin/dbt2-nuodb-profile || exit 1
+source ${bin_dir}/dbt2-nuodb-profile || exit 1
 
 usage() {
 

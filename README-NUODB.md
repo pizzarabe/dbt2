@@ -14,8 +14,10 @@ the pip installation procedure. You should have:
 1. Python version 2.7.2
 2. R version 2.15.2
         Ubuntu: apt-get install r-base
+        CentOS: yum install R
 3. rpy2 version 2.3.1
         Ubuntu: apt-get install python-rpy2
+        pip: pip install rpy2
 
 You will also need a GNU compiler, CMake (the latest version possible).
 
@@ -77,7 +79,7 @@ so you should not have to configure anything in that case.
 The benchmark is run using the run_workload script. Usage is as follows:
 
 ```bash
-dbt2-run-workload -c <number of database connections> -d <duration of test> -w <number of warehouses>
+dbt2-run-workload -a nuodb -c <number of database connections> -d <duration of test> -w <number of warehouses>
 ```
 
 Other options:
@@ -92,7 +94,7 @@ Other options:
 >       -w #  -  Set the warehouse scale factor.
 >       -z <comments for the test>
 
-Example: dbt2-run-workload -c 20 -d 100 -w 1 -s 100 -o /var/tmp/results-1
+Example: dbt2-run-workload -a nuodb -c 20 -d 100 -w 1 -s 100 -o /var/tmp/results-1
 
 Test will be run for 120 seconds with 20 database connections and scale factor (num of warehouses) 1
 

@@ -17,7 +17,7 @@ LOGFILE="dbt2.log"
 OUTDIR="."
 HOSTNAME=`hostname`
 
-while getopts "fo:p:s:" OPT; do
+while getopts "f:o:p:s:" OPT; do
 	case ${OPT} in
 	f)
 		if [ -f "${DBT2DATADIR}/${HOSTNAME}.pid" ]; then

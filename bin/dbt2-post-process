@@ -7,11 +7,13 @@
 # Copyright (C) 2006      Open Source Development Labs, Inc.
 #               2006-2010 Mark Wong
 #
+from contextlib import closing
+from math import sqrt
 
 import sys
 import os
-import rpy2.robjects as robjects
-from rpy2.robjects import DataFrame
+
+__90_percentile_stddev__ = 1.28
 
 if len(sys.argv) != 2:
     print 'usage: %s <mix.log>' % sys.argv[0]
@@ -23,59 +25,102 @@ if not os.path.exists(filename):
     print 'cannot open file: %s' % filename
     sys.exit(1)
 
-d = 'd'
-n = 'n'
-o = 'o'
-p = 'p'
-s = 's'
+transaction_name = dict()
+transaction_name['d'] = 'Delivery'
+transaction_name['n'] = 'New Order'
+transaction_name['o'] = 'Order Status'
+transaction_name['p'] = 'Payment'
+transaction_name['s'] = 'Stock Level'
 
-dataframe = dict()
+result_name = dict()
+result_name['C'] = 'Complete'
+result_name['R'] = 'Rollback'
+result_name['E'] = 'Error'
+
 transaction_count = dict()
 rollback_count = dict()
-per90 = dict()
-average_rt = dict()
+sum_rt = dict()
+sumsq_rt = dict()
 
-r = robjects.r
+steadystate_start = 0
+steadystate_end = 0
+rampup_start = 0
+error_count = 0
 
-df = DataFrame.from_csvfile(filename, header=False)
-rampup_start = df[0][0]
+for key in transaction_name.keys():
+    transaction_count[key] = 0
+    rollback_count[key] = 0
+    sum_rt[key] = 0
+    sumsq_rt[key] = 0
 
-start_subset = r.subset(df, df.rx('V2').ro == "START")
-if start_subset.nrow == 0:
+steadystate = False
+with closing(open(filename, 'r')) as mix_file:
+    for line in mix_file:
+        vars = line.split(',')
+        if len(vars) != 5:
+            print 'Result mix file, invalid line: %s' % line
+            continue
+        V1_timestamp = int(vars[0])
+        V2_txkey = vars[1]
+
+        if steadystate:
+            if V2_txkey == 'TERMINATED':
+                continue
+            V3_txresult = vars[2]
+            if V2_txkey not in transaction_name:
+                print 'Invalid transaction key, ignoring line: %s' % line
+                continue
+            if V3_txresult not in result_name:
+                print 'Invalid result flag, ignoring line: %s' % line
+                continue
+
+            transaction_count[V2_txkey] += 1
+            if V3_txresult == 'R':
+                rollback_count[V2_txkey] += 1
+            elif V3_txresult == 'E':
+                error_count += 1
+                continue
+
+            #Note: we include rolled back txns in response time avg because original dbt2 does
+            V4_rt = float(vars[3])
+            sum_rt[V2_txkey] += V4_rt
+            sumsq_rt[V2_txkey] += V4_rt * V4_rt
+
+            steadystate_end = V1_timestamp
+
+        else:
+            if V2_txkey == 'START':
+                steadystate = True
+                steadystate_start = V1_timestamp
+                continue
+            elif rampup_start == 0:
+                steadystate_start = V1_timestamp
+                continue
+
+if steadystate_start<= rampup_start:
     print 'START market not found in: %s' % filename
     sys.exit(1)
-steadystate_start = r.subset(df, df.rx('V2').ro == "START")[0][0]
-steadystate_end = df[0][df.nrow - 1]
-steadystate = r.subset(df, df.rx('V1').ro > steadystate_start)
-if steadystate.nrow == 0:
+if steadystate_start >= steadystate_end:
     print 'No data was collected during the steady state portion of the test.'
     sys.exit(1)
-error_count = r.subset(steadystate, steadystate.rx('V3').ro == "E").nrow
-total_transaction_count = steadystate.nrow
 
-for key in [d, n, o, p, s]:
-    dataframe[key] = r.subset(steadystate, steadystate.rx('V2').ro == key)
-    transaction_count[key] = dataframe[key].nrow
-    if transaction_count[key] > 0:
-        rollback_count[key] = r.subset(dataframe[key],
-            dataframe[key].rx('V3').ro == "R").nrow
-    else:
-        rollback_count[key] = 0
-    per90[key] = r.quantile(dataframe[key].rx('V4')[0], .9)[0]
-    average_rt[key] = r.colMeans(dataframe[key].rx('V4'))[0]
+average_rt = dict()
+per90 = dict()
+total_transaction_count = 0
+for key in transaction_name.keys():
+    if transaction_count[key] >1:
+        total_transaction_count += transaction_count[key]
+        average_rt[key] = sum_rt[key] / transaction_count[key]
+        #Note: estimating 90th percentile from standard deviation, for efficiency
+        stddev = sqrt((sumsq_rt[key] / transaction_count[key]) - (average_rt[key] * average_rt[key]))
+        per90[key] = average_rt[key] + stddev * __90_percentile_stddev__
 
-transaction_name = dict()
-transaction_name[d] = 'Delivery'
-transaction_name[n] = 'New Order'
-transaction_name[o] = 'Order Status'
-transaction_name[p] = 'Payment'
-transaction_name[s] = 'Stock Level'
 
 print '                         Response Time (s)'
 print ' Transaction      %    Average :    90th %        Total        Rollbacks      %'
 print '------------  -----  ---------------------  -----------  ---------------  -----'
 
-for key in [d, n, o, p, s]:
+for key in transaction_name.keys():
     try:
         mix_percentage = float(transaction_count[key]) /\
                          float(total_transaction_count) * 100.0
@@ -102,7 +147,7 @@ print '------------  -----  ---------------------  -----------  --------------- 
 duration = float(steadystate_end - steadystate_start)
 print
 print '%0.2f new-order transactions per minute (NOTPM)' %\
-      (float(transaction_count[n]) * 60.0 / duration)
+      (float(transaction_count['n']) * 60.0 / duration)
 print '%0.1f minute duration' % (duration / 60.0)
 print '%d total unknown errors' % error_count
 print '%0.1f seconds(s) ramping up' %\

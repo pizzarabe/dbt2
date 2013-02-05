@@ -89,6 +89,7 @@ int nuodb_connect(
         props->putValue("user", username);
         props->putValue("password", password);
         props->putValue("schema", schema);
+        props->putValue("isolation", "write_committed");
         if (tmzone)
         {
             props->putValue("TimeZone", tmzone);

@@ -3,6 +3,25 @@
 
 #include "nuodb_capi.h"
 
+/*
+#define NUODB_NEW_ORDER_2 \
+        "SELECT d_tax, (next value for order_seq) as order_id\n" \
+        "FROM district \n" \
+        "WHERE d_w_id = %d\n" \
+        "  AND d_id = %d"
+
+#define NUODB_NEW_ORDER_3 \
+        "UPDATE district\n" \
+        "SET d_next_o_id = %d\n" \
+        "WHERE d_w_id = %d\n" \
+        "  AND d_id = %d"
+
+#define NUODB_STOCK_LEVEL_1 \
+        "SELECT (next value for order_seq) as d_next_o_id\n" \
+        "FROM dual"
+*/
+
+
 struct db_context_t
 {
 	nuodb_connection_t * connection;

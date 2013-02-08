@@ -23,7 +23,7 @@ MULTI-TIER TESTING
 
   DBT2DATADIR=/tmp/mydbt2
 
-- Enalbe tcp/ip listening in the defaults file (see example from above).  This
+- Enable tcp/ip listening in the defaults file (see example from above).  This
   binds to all network interfaces:
 
   bind-address = 0.0.0.0

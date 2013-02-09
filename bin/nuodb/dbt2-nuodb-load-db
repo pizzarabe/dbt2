@@ -307,7 +307,7 @@ echo "  GENERATE_DATAFILE:  $GENERATE_DATAFILE"
 
 mkdir -p ${DB_DATA}
 if [ ${GENERATE_DATAFILE} -eq 1 ]; then
-    ./dbt2-datagen -d ${DB_DATA} -w ${WAREHOUSES} --nuodb || exit 1
+    ${bin_dir}/dbt2-datagen -d ${DB_DATA} -w ${WAREHOUSES} --nuodb || exit 1
 fi
 
 echo ""

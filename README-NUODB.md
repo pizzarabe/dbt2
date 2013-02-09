@@ -8,16 +8,9 @@ You can download the cleaned up version of DBT-2 from Github here:
 
 ## Install Prerequisite Software
 
-Install R-core, and Python. For Python install the latest version of rpy2 using
-the pip installation procedure. You should have:
-
-1. Python version 2.7.2
-2. R version 2.15.2
-        Ubuntu: apt-get install r-base
-        CentOS: yum install R
-3. rpy2 version 2.3.1
-        Ubuntu: apt-get install python-rpy2
-        pip: pip install rpy2
+Install Python 2.7.2 for run scripts. 
+In this newest version of DBT-2 we have replace the dependency on R and rpy2 with a
+pure Python implementation of the post-process module.
 
 You will also need a GNU compiler, CMake (the latest version possible).
 
@@ -27,7 +20,7 @@ The build procedure is simple:
 ```bash
 export NUODB_INCLUDE_DIR=/Users/rbuck/tmp/nuodb/include
 export NUODB_LIB_DIR=/Users/rbuck/tmp/nuodb/lib64
-cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/dbt -DCMAKE_BUILD_TYPE=Debug
+cmake -G "Unix Makefiles" -DDBMS=nuodb -DCMAKE_BUILD_TYPE=Debug
 make
 ```
 

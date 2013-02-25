@@ -2,6 +2,7 @@
 
 : ${NUODB_ROOT:="/Users/rbuck/tmp/nuodb"}
 : ${DB_HOST:="localhost"}
+: ${DB_ENGINE_HOSTS:="localhost"}
 : ${DB_PORT:="48004"}
 : ${DB_DOMAIN:="domain"}
 : ${DB_DOMAIN_PASSWORD:="bird"}
@@ -21,7 +22,7 @@ NUODB_MANAGER="java -jar ${NUODB_ROOT}/jar/nuodbmanager.jar --user ${DB_DOMAIN} 
 NUODB_AGENT=${NUODB_ROOT}/bin/nuoagent.jar
 if [ ! -e ${NUODB_AGENT} ]; then
 	NUODB_AGENT=${NUODB_ROOT}/jar/nuoagent.jar
-fi
+fi  
 
 if [ ! -d ${DB_DATA} ]; then
     mkdir -p ${DB_DATA}

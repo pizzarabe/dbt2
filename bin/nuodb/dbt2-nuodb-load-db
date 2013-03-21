@@ -316,6 +316,7 @@ fi
 FILE="$(mktemp 'XXXXXXXXXX.sql')"
 echo "drop schema ${DB_NAME} cascade;" > ${FILE}
 command_exec "$NUODB_SQL ${DB_NAME}@${DB_HOST}:${DB_PORT} --user ${DB_USER} --password ${DB_PASSWORD} --file ${FILE}"
+rm -f ${FILE}
 
 echo ""
 create_tables

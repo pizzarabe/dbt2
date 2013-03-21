@@ -7,11 +7,6 @@
 # Copyright (C) 2010 Mark Wong
 #
 
-if [ "x" = "x${DBT2DATADIR}" ]; then
-    echo "ERROR: DBT2DATADIR must be set"
-    exit 1
-fi
-
 HOSTNAME=`hostname`
 
 usage() {
@@ -33,6 +28,7 @@ usage() {
   echo '       -h <database host>'
   echo '       -u <database user>'
   echo '       -P <database password>'
+  echo '       -N <do not start database>'  
   echo '       -e <storage engine: [MYISAM|INNODB|BDB]. (default INNODB)>'
   echo '       -l <to use LOCAL keyword while loading dataset>'
   echo '       -v <verbose>'  
@@ -375,7 +371,7 @@ DB_SCHEME="OPTIMIZED"
 GENERATE_DATAFILE=0
 WAREHOUSES=1
 
-while getopts "d:h:f:gs:e:lm:u:P:p:vw:" opt; do
+while getopts "d:h:f:gs:e:lm:u:P:Ns:p:vw:" opt; do
 	case $opt in
 	p)
 		DEFAULTS_FILE=${OPTARG}
@@ -406,7 +402,10 @@ while getopts "d:h:f:gs:e:lm:u:P:p:vw:" opt; do
 		;;
 	P)
 		DB_PASSWORD=$OPTARG
-		;;	
+		;;
+    N)
+		DB_MGMT_OFF=1
+		;;
 	e)
 		DB_ENGINE=$OPTARG
 		;;
@@ -457,22 +456,34 @@ if [ "${DB_PASSWORD}" != "" ]; then
   MYSQL_ARGS="--password=${DB_PASSWORD}"
 fi
 
-if [ ! -d "${DBT2DATADIR}" ]; then
-  mysql_install_db --datadir=${DBT2DATADIR} || exit 1
-fi
+if [ ! ${DB_MGMT_OFF} ]; then
+	if [ "x" = "x${DBT2DATADIR}" ]; then
+		echo "ERROR: DBT2DATADIR must be set"
+		exit 1
+	fi
 
-if [ ! -f "${DBT2DATADIR}/${HOSTNAME}.pid" ]; then
-  ${DIR}/dbt2-mysql-start-db ${DEFAULTS_FILE_ARG} || exit 1
+	if [ ! -d "${DBT2DATADIR}" ]; then
+		mysql_install_db --datadir=${DBT2DATADIR} || exit 1
+	fi
+
+	if [ ! -f "${DBT2DATADIR}/${HOSTNAME}.pid" ]; then
+		${DIR}/dbt2-mysql-start-db ${DEFAULTS_FILE_ARG} || exit 1
+	fi
 fi
 
 if [ ${GENERATE_DATAFILE} -eq 1 ]; then
   #
   # Generate data files.
   #
-  dbt2-datagen -d ${DB_PATH} -w ${WAREHOUSES} --mysql || exit 1
+  $(dirname $0)/dbt2-datagen -d ${DB_PATH} -w ${WAREHOUSES} --mysql || exit 1
 fi
 
-MYSQL_ARGS="$MYSQL_ARGS -h $DB_HOST -u $DB_USER --socket=$DB_SOCKET"
+MYSQL_ARGS="$MYSQL_ARGS -h $DB_HOST -u $DB_USER --local-infile=1"
+
+if [ -n "${DB_SOCKET}" ]; then
+	MYSQL_ARGS="$MYSQL_ARGS --socket=$DB_SOCKET"
+fi
+
 MYSQL="mysql $MYSQL_ARGS"
 
 echo ""

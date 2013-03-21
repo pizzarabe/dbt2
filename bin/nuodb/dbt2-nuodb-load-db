@@ -26,6 +26,7 @@ usage() {
     echo '       -u <database user>'
     echo '       -p <database password>'
     echo '       -s <database schema>'
+	echo '       -N <do not start database>'  
     echo '       -v <verbose>'
     echo '       -w <scale factor>'
     echo ''
@@ -61,23 +62,23 @@ command_exec() {
 
 load_tables() {
 
-    STOCK="INSERT INTO dbt2.stock (s_i_id, s_w_id, s_quantity, s_dist_01, s_dist_02, s_dist_03, s_dist_04, s_dist_05, s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10, s_ytd, s_order_cnt, s_remote_cnt, s_data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    STOCK="INSERT INTO ${DB_NAME}.stock (s_i_id, s_w_id, s_quantity, s_dist_01, s_dist_02, s_dist_03, s_dist_04, s_dist_05, s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10, s_ytd, s_order_cnt, s_remote_cnt, s_data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
-    ITEM="INSERT INTO dbt2.item (i_id, i_im_id, i_name, i_price, i_data) VALUES (?,?,?,?,?)"
+    ITEM="INSERT INTO ${DB_NAME}.item (i_id, i_im_id, i_name, i_price, i_data) VALUES (?,?,?,?,?)"
 
-    ORDER_LINE="INSERT INTO dbt2.order_line (ol_o_id, ol_d_id, ol_w_id, ol_number, ol_i_id, ol_supply_w_id, ol_delivery_d, ol_quantity, ol_amount, ol_dist_info) VALUES (?,?,?,?,?,?,?,?,?,?)"
+    ORDER_LINE="INSERT INTO ${DB_NAME}.order_line (ol_o_id, ol_d_id, ol_w_id, ol_number, ol_i_id, ol_supply_w_id, ol_delivery_d, ol_quantity, ol_amount, ol_dist_info) VALUES (?,?,?,?,?,?,?,?,?,?)"
 
-    ORDER="INSERT INTO dbt2.orders (o_id, o_d_id, o_w_id, o_c_id, o_entry_d, o_carrier_id, o_ol_cnt, o_all_local) VALUES (?,?,?,?,?,?,?,?)"
+    ORDER="INSERT INTO ${DB_NAME}.orders (o_id, o_d_id, o_w_id, o_c_id, o_entry_d, o_carrier_id, o_ol_cnt, o_all_local) VALUES (?,?,?,?,?,?,?,?)"
 
-    NEW_ORDER="INSERT INTO dbt2.new_order (no_o_id, no_d_id, no_w_id) VALUES (?,?,?)"
+    NEW_ORDER="INSERT INTO ${DB_NAME}.new_order (no_o_id, no_d_id, no_w_id) VALUES (?,?,?)"
 
-    HISTORY="INSERT INTO dbt2.history (h_c_id, h_c_d_id, h_c_w_id, h_d_id, h_w_id, h_date, h_amount, h_data) VALUES (?,?,?,?,?,?,?,?)"
+    HISTORY="INSERT INTO ${DB_NAME}.history (h_c_id, h_c_d_id, h_c_w_id, h_d_id, h_w_id, h_date, h_amount, h_data) VALUES (?,?,?,?,?,?,?,?)"
 
-    CUSTOMER="INSERT INTO dbt2.customer (c_id, c_d_id, c_w_id, c_first, c_middle, c_last, c_street_1, c_street_2, c_city, c_state, c_zip, c_phone, c_since, c_credit, c_credit_lim, c_discount, c_balance, c_ytd_payment, c_payment_cnt, c_delivery_cnt, c_data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    CUSTOMER="INSERT INTO ${DB_NAME}.customer (c_id, c_d_id, c_w_id, c_first, c_middle, c_last, c_street_1, c_street_2, c_city, c_state, c_zip, c_phone, c_since, c_credit, c_credit_lim, c_discount, c_balance, c_ytd_payment, c_payment_cnt, c_delivery_cnt, c_data) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
-    DISTRICT="INSERT INTO dbt2.district (d_id, d_w_id, d_name, d_street_1, d_street_2, d_city, d_state, d_zip, d_tax, d_ytd, d_next_o_id) VALUES (?,?,?,?,?,?,?,?,?,?, 3001)"
+    DISTRICT="INSERT INTO ${DB_NAME}.district (d_id, d_w_id, d_name, d_street_1, d_street_2, d_city, d_state, d_zip, d_tax, d_ytd, d_next_o_id) VALUES (?,?,?,?,?,?,?,?,?,?, 3001)"
 
-    WAREHOUSE="INSERT INTO dbt2.warehouse (w_id, w_name,w_street_1, w_street_2, w_city, w_state, w_zip, w_tax, w_ytd) VALUES (?,?,?,?,?,?,?,?,?)"
+    WAREHOUSE="INSERT INTO ${DB_NAME}.warehouse (w_id, w_name,w_street_1, w_street_2, w_city, w_state, w_zip, w_tax, w_ytd) VALUES (?,?,?,?,?,?,?,?,?)"
 
     # /var/tmp/dbt2/data/warehouse.data
     TABLES="CUSTOMER DISTRICT HISTORY WAREHOUSE ITEM NEW_ORDER ORDER ORDER_LINE STOCK"
@@ -89,7 +90,7 @@ load_tables() {
         echo $FILENAME
         SQL_TEXT=`eval "echo -e \\$${TABLE}"`
         #echo "SQL_TEXT: ${SQL_TEXT}"
-        command_exec "${NUODB_LOADER} --user ${DB_USER} --password ${DB_PASSWORD} --import ${FILENAME},separator=tab --schema ${DB_SCHEMA} --to \"${SQL_TEXT}\" ${DB_NAME}@${DB_HOST}:${DB_PORT} || true"
+        command_exec "${NUODB_LOADER} --user ${DB_USER} --password ${DB_PASSWORD} --import ${FILENAME},separator=tab --schema ${DB_NAME} --to \"${SQL_TEXT}\" ${DB_NAME}@${DB_HOST}:${DB_PORT} || true"
     done
 }
 
@@ -245,12 +246,12 @@ create_tables() {
         echo "Creating table $TABLE"
         FILE="$(mktemp 'XXXXXXXXXX.sql')" || { echo "Failed to create temp file"; exit 1; }
         eval "echo -e \$$TABLE \; \\\\n quit" >> $FILE
-        command_exec "$NUODB_SQL ${DB_NAME}@${DB_HOST}:${DB_PORT} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_SCHEMA} --file ${FILE}"
+        command_exec "$NUODB_SQL ${DB_NAME}@${DB_HOST}:${DB_PORT} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} --file ${FILE}"
         rm -f $FILE
     done
 }
 
-while getopts "n:d:gs:h:u:p:s:vs:w:" opt; do
+while getopts "n:d:gs:h:u:p:vs:w:Ns:" opt; do
     case $opt in
     n)
         DB_NAME=${OPTARG}
@@ -270,9 +271,9 @@ while getopts "n:d:gs:h:u:p:s:vs:w:" opt; do
     p)
         DB_PASSWORD=$OPTARG
         ;;	
-    s)
-        DB_SCHEMA=$OPTARG
-        ;;
+    N)
+		DB_MGMT_OFF=1
+		;;
     v)
         VERBOSE=1
         ;;
@@ -292,7 +293,6 @@ echo ""
 echo "  DB_HOST:            $DB_HOST"
 echo "  DB_PORT:            $DB_PORT"
 echo "  DB_NAME:            $DB_NAME"
-echo "  DB_SCHEMA:          $DB_SCHEMA"
 echo "  DB_USER:            $DB_USER"
 echo "  DB_PASSWORD:        $DB_PASSWORD"
 echo "  DB_DOMAIN:          $DB_DOMAIN"
@@ -303,6 +303,8 @@ echo "  WAREHOUSES:         $WAREHOUSES"
 echo "  GENERATE_DATAFILE:  $GENERATE_DATAFILE"
 
 # todo: add code here to start the database if it is not presently started...
+# if [ ! ${DB_MGMT_OFF} ]; then
+# fi
 
 # optionally generate data files...
 
@@ -310,6 +312,10 @@ mkdir -p ${DB_DATA}
 if [ ${GENERATE_DATAFILE} -eq 1 ]; then
     ${bin_dir}/dbt2-datagen -d ${DB_DATA} -w ${WAREHOUSES} --nuodb || exit 1
 fi
+
+FILE="$(mktemp 'XXXXXXXXXX.sql')"
+echo "drop schema ${DB_NAME} cascade;" > ${FILE}
+command_exec "$NUODB_SQL ${DB_NAME}@${DB_HOST}:${DB_PORT} --user ${DB_USER} --password ${DB_PASSWORD} --file ${FILE}"
 
 echo ""
 create_tables

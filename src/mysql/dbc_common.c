@@ -17,7 +17,7 @@ char mysql_host[32] = "localhost";
 char mysql_user[32] = "root";
 char mysql_pass[32] = "";
 char mysql_port_t[32] = "0";
-char mysql_socket_t[256] = "/tmp/mysql.sock";
+char mysql_socket_t[256] = {0};
 
 
 int commit_transaction(struct db_context_t *dbc)
@@ -38,7 +38,7 @@ int _connect_to_db(struct db_context_t *dbc)
     dbc->mysql=mysql_init(NULL);
 
     //FIXME: change atoi() to strtol() and check for errors
-    if (!mysql_real_connect(dbc->mysql, mysql_host, mysql_user, mysql_pass, mysql_dbname, atoi(mysql_port_t), mysql_socket_t, 0))
+    if (!mysql_real_connect(dbc->mysql, mysql_host, mysql_user, mysql_pass, mysql_dbname, atoi(mysql_port_t), mysql_socket_t[0] ? mysql_socket_t : NULL, 0))
     {
         if (mysql_errno(dbc->mysql))
         {

@@ -146,10 +146,26 @@ ELSEIF (DBMS STREQUAL "mysql")
 
     IF (MYSQL_CONFIG_FOUND)
         MESSAGE(STATUS "Found mysql_config for MySQL: ${MYSQL_CONFIG}")
-        SET(DB_SOURCE src/mysql/dbc_common.c src/mysql/dbc_new_order.c
-                src/mysql/dbc_payment.c src/mysql/dbc_order_status.c
-                src/mysql/dbc_delivery.c src/mysql/dbc_stock_level.c
-                src/mysql/dbc_integrity.c)
+
+		IF (NONSP MATCHES "1")
+		  SET(DB_SOURCE src/mysql/dbc_common.c
+                       src/nonsp/dbc_new_order.c
+                       src/nonsp/dbc_payment.c
+                       src/nonsp/dbc_order_status.c
+                       src/nonsp/dbc_delivery.c
+                       src/nonsp/dbc_stock_level.c
+                       src/nonsp/dbc_nonsp.c
+                       src/nonsp/dbc_integrity.c)
+		ELSE(NONSP MATCHES "1")
+          SET(DB_SOURCE src/mysql/dbc_common.c
+		  			   src/mysql/dbc_new_order.c
+					   src/mysql/dbc_payment.c
+					   src/mysql/dbc_order_status.c
+					   src/mysql/dbc_delivery.c
+					   src/mysql/dbc_stock_level.c
+					   src/mysql/dbc_integrity.c)
+		ENDIF(NONSP MATCHES "1")
+
         EXECUTE_PROCESS(COMMAND ${MYSQL_CONFIG} --include OUTPUT_VARIABLE
                 MYSQL_INCLUDE_CFLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
         EXECUTE_PROCESS(COMMAND ${MYSQL_CONFIG} --libs OUTPUT_VARIABLE
@@ -239,15 +255,27 @@ ELSEIF (DBMS STREQUAL "nuodb")
         SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,'$$ORIGIN'")
     ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-    SET(DB_SOURCE src/nuodb/dbc_common.c
-                  src/nuodb/nuodb_capi.cpp
-                  src/nuodb/dbc_new_order.c
-                  src/nuodb/dbc_stock_level.c
-                  src/nonsp/dbc_payment.c
-                  src/nonsp/dbc_order_status.c
-                  src/nonsp/dbc_delivery.c
-                  src/nonsp/dbc_nonsp.c
-                  src/nonsp/dbc_integrity.c)
+		IF (NONSP MATCHES "1")
+		  SET(DB_SOURCE src/nuodb/dbc_common.c
+            		   src/nuodb/nuodb_capi.cpp
+                       src/nonsp/dbc_new_order.c
+                       src/nonsp/dbc_payment.c
+                       src/nonsp/dbc_order_status.c
+                       src/nonsp/dbc_delivery.c
+                       src/nonsp/dbc_stock_level.c
+                       src/nonsp/dbc_nonsp.c
+                       src/nonsp/dbc_integrity.c)
+		ELSE(NONSP MATCHES "1")
+		  SET(DB_SOURCE src/nuodb/dbc_common.c
+            		   src/nuodb/nuodb_capi.cpp
+					   src/nuodb/dbc_new_order.c
+					   src/nuodb/dbc_stock_level.c
+					   src/nonsp/dbc_payment.c
+					   src/nonsp/dbc_order_status.c
+					   src/nonsp/dbc_delivery.c
+					   src/nonsp/dbc_nonsp.c
+					   src/nonsp/dbc_integrity.c)
+		ENDIF(NONSP MATCHES "1")
 
 ELSE (NOT DEFINED DBMS)
     MESSAGE(FATAL_ERROR "Need to specify -DDBMS=drizzle|mysql|nuodb|pgsql|sqlite")

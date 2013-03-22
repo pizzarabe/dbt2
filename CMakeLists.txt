@@ -243,9 +243,9 @@ ELSEIF (DBMS STREQUAL "nuodb")
                   src/nuodb/nuodb_capi.cpp
                   src/nuodb/dbc_new_order.c
                   src/nuodb/dbc_stock_level.c
-                  src/nuodb/dbc_payment.c
-                  src/nuodb/dbc_order_status.c
-                  src/nuodb/dbc_delivery.c
+                  src/nonsp/dbc_payment.c
+                  src/nonsp/dbc_order_status.c
+                  src/nonsp/dbc_delivery.c
                   src/nonsp/dbc_nonsp.c
                   src/nonsp/dbc_integrity.c)
 

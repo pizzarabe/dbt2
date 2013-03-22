@@ -29,6 +29,7 @@ void dbt2_escape_str(char *orig_str, char *esc_str)
     if (orig_str && esc_str) {
         int len= strlen(orig_str);
         for (i = 0, j = 0; i < len; i++) {
+#ifndef NUODB
             if (orig_str[i] == '\'') {
                 esc_str[j++] = '\'';
 #ifndef LIBSQLITE
@@ -38,6 +39,7 @@ void dbt2_escape_str(char *orig_str, char *esc_str)
                 esc_str[j++] = '\\';
 #endif
             }
+#endif
             esc_str[j++] = orig_str[i];
         }
         esc_str[j] = '\0';

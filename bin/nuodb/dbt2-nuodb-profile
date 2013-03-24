@@ -1,18 +1,17 @@
 #!/bin/bash
 
-: ${NUODB_ROOT:="/Users/rbuck/tmp/nuodb"}
+: ${NUODB_ROOT:="/opt/nuodb"}
 : ${DB_HOST:="localhost"}
 : ${DB_ENGINE_HOSTS:="localhost"}
 : ${DB_PORT:="48004"}
 : ${DB_DOMAIN:="domain"}
 : ${DB_DOMAIN_PASSWORD:="bird"}
 : ${DB_NAME:="dbt2"}
-: ${DB_SCHEMA:="dbt2"}
 : ${DB_USER:="dbt2"}
 : ${DB_PASSWORD="dbt2"}
 : ${DB_PORT_RANGE:="48010,48999"}
-: ${DB_DATA:="/var/tmp/dbt2/data"}
-: ${DB_LOGS:="/var/tmp/dbt2/logs"}
+: ${DB_DATA:="/tmp/dbt2/data"}
+: ${DB_LOGS:="/tmp/dbt2/logs"}
 : ${LOG_FILE:="/dev/null"}
 : ${ENGINE_ARGS:="--verbose dump"}
 

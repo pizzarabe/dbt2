@@ -22,6 +22,6 @@ case $DBMS in
 
 	mysql)
 		shift 1
-		targets/nuodb/bin/dbt2-run-location -u olevin -p merlin ${PARAMS}
+		targets/mysql/bin/dbt2-run-location -u olevin -p merlin ${PARAMS}
 		;;
 esac

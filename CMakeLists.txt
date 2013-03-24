@@ -364,5 +364,6 @@ TARGET_LINK_LIBRARIES(${DBT2_TXN_TEST} "-lm ${DB_LIBS} -lpthread")
 INSTALL(PROGRAMS ${DBT2_CLIENT} ${DBT2_DATAGEN} ${DBT2_DRIVER} ${DBT2_TXN_TEST}
         bin/dbt2-generate-report bin/dbt2-get-os-info bin/dbt2-post-process
         bin/dbt2-run-workload bin/dbt2-sysstats bin/dbt2-plot-transaction-rate
+		bin/dbt2-run-location
         ${DB_SCRIPTS} DESTINATION bin)
 

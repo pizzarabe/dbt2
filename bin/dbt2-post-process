@@ -115,6 +115,9 @@ for key in transaction_name.keys():
         #Note: estimating 90th percentile from standard deviation, for efficiency
         stddev = sqrt((sumsq_rt[key] / transaction_count[key]) - (average_rt[key] * average_rt[key]))
         per90[key] = average_rt[key] + stddev * __90_percentile_stddev__
+    else:
+        average_rt[key] = 0;
+        per90[key] = 0;
 
 
 print '                         Response Time (s)'

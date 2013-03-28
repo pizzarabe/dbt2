@@ -181,7 +181,7 @@ create_tables() {
         no_o_id int not null default '0',
         no_d_id int not null default '0',
         no_w_id int not null default '0',
-        primary key (no_o_id, no_d_id, no_w_id)
+        primary key (no_d_id, no_w_id, no_o_id)
         )"
 
     ORDERS="create table orders (

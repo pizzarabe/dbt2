@@ -14,10 +14,12 @@
 : ${DB_LOGS:="/tmp/dbt2/logs"}
 : ${LOG_FILE:="/dev/null"}
 : ${ENGINE_ARGS:="--verbose dump"}
+: ${NUODB_SQL:=${NUODB_ROOT}/bin/nuosql}
+: ${NUODB_LOADER:=${NUODB_ROOT}/bin/nuoloader}
+: ${NUODB_MANAGER:="java -jar ${NUODB_ROOT}/jar/nuodbmanager.jar"}
+	
+NUODB_MANAGER="${NUODB_MANAGER} --user ${DB_DOMAIN} --password ${DB_DOMAIN_PASSWORD} --broker ${DB_HOST}:${DB_PORT} --command"
 
-NUODB_SQL=${NUODB_ROOT}/bin/nuosql
-NUODB_LOADER=${NUODB_ROOT}/bin/nuoloader
-NUODB_MANAGER="java -jar ${NUODB_ROOT}/jar/nuodbmanager.jar --user ${DB_DOMAIN} --password ${DB_DOMAIN_PASSWORD} --broker ${DB_HOST}:${DB_PORT} --command"
 NUODB_AGENT=${NUODB_ROOT}/bin/nuoagent.jar
 if [ ! -e ${NUODB_AGENT} ]; then
 	NUODB_AGENT=${NUODB_ROOT}/jar/nuoagent.jar

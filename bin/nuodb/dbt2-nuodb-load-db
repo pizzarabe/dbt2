@@ -107,7 +107,7 @@ create_tables() {
         w_tax real,
         w_ytd numeric(24, 12),
         primary key (w_id)
-        )"
+        ) with record_batching = 1"
 
 #    DISTRICT="create table district (
 #        d_id int not null default '0',
@@ -137,9 +137,9 @@ create_tables() {
         d_zip char(9),
         d_tax real,
         d_ytd numeric(24, 12),
-	d_next_o_id integer,
+        d_next_o_id integer,
         primary key (d_w_id, d_id)
-        )"
+        ) with record_batching = 2"
 
     CUSTOMER="create table customer (
         c_id int not null default '0',
@@ -181,7 +181,7 @@ create_tables() {
         no_o_id int not null default '0',
         no_d_id int not null default '0',
         no_w_id int not null default '0',
-        primary key (no_d_id, no_w_id, no_o_id)
+        primary key (no_w_id, no_d_id, no_o_id)
         )"
 
     ORDERS="create table orders (

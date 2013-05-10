@@ -16,3 +16,5 @@ bin/dbt2-datagen
 bin/dbt2-driver
 bin/dbt2-transaction-test
 *.log
+install_manifest.txt
+targets

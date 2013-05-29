@@ -90,8 +90,10 @@ load_tables() {
         echo $FILENAME
         SQL_TEXT=`eval "echo -e \\$${TABLE}"`
         #echo "SQL_TEXT: ${SQL_TEXT}"
-        command_exec "${NUODB_LOADER} --user ${DB_USER} --password ${DB_PASSWORD} --import ${FILENAME},separator=tab --schema ${DB_NAME} --to \"${SQL_TEXT}\" ${DB_NAME}@${DB_HOST}:${DB_PORT} || true"
+        command_exec "${NUODB_LOADER} --user ${DB_USER} --password ${DB_PASSWORD} --import ${FILENAME},separator=tab --schema ${DB_NAME} --to \"${SQL_TEXT}\" ${DB_NAME}@${DB_HOST}:${DB_PORT} &"
     done
+
+	wait
 }
 
 create_tables() {

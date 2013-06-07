@@ -14,3 +14,5 @@ technology.
 If you plan on using this, you ought to at least read the requirements and install
 sections of the NuoDB README as it details some requirements not detailed clearly in
 the original README, now named README-INTRO.
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/15efd60c5b18de7b93d2fc5e5157afdb "githalytics.com")](http://githalytics.com/nuodb/dbt2)

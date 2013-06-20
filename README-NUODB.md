@@ -46,7 +46,7 @@ make package
 Modify the bin/nuodb/dbt2-nuodb-profile file so that your NuoDB installation
 location is properly identified:
 
->       : ${NUODB_ROOT:="/home/rbuck/tmp/nuodb"}
+>       : ${NUODB_HOME:="/home/rbuck/tmp/nuodb"}
 
 ## Generate and Load Data
 In order to test you have to generate data files which are imported into NuoDB

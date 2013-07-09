@@ -255,27 +255,27 @@ ELSEIF (DBMS STREQUAL "nuodb")
         SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,'$$ORIGIN'")
     ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-		IF (NONSP MATCHES "1")
-		  SET(DB_SOURCE src/nuodb/dbc_common.c
-            		   src/nuodb/nuodb_capi.cpp
-                       src/nonsp/dbc_new_order.c
-                       src/nonsp/dbc_payment.c
-                       src/nonsp/dbc_order_status.c
-                       src/nonsp/dbc_delivery.c
-                       src/nonsp/dbc_stock_level.c
-                       src/nonsp/dbc_nonsp.c
-                       src/nonsp/dbc_integrity.c)
-		ELSE(NONSP MATCHES "1")
-		  SET(DB_SOURCE src/nuodb/dbc_common.c
-            		   src/nuodb/nuodb_capi.cpp
-					   src/nuodb/dbc_new_order.c
-					   src/nuodb/dbc_stock_level.c
-					   src/nonsp/dbc_payment.c
-					   src/nonsp/dbc_order_status.c
-					   src/nonsp/dbc_delivery.c
-					   src/nonsp/dbc_nonsp.c
-					   src/nonsp/dbc_integrity.c)
-		ENDIF(NONSP MATCHES "1")
+    IF (NONSP MATCHES "1")
+        SET(DB_SOURCE src/nuodb/dbc_common.c
+            src/nuodb/nuodb_capi.cpp
+            src/nonsp/dbc_new_order.c
+            src/nonsp/dbc_payment.c
+            src/nonsp/dbc_order_status.c
+            src/nonsp/dbc_delivery.c
+            src/nonsp/dbc_stock_level.c
+            src/nonsp/dbc_nonsp.c
+            src/nonsp/dbc_integrity.c)
+    ELSE(NONSP MATCHES "1")
+        SET(DB_SOURCE src/nuodb/dbc_common.c
+            src/nuodb/nuodb_capi.cpp
+            src/nuodb/dbc_new_order.c
+            src/nuodb/dbc_stock_level.c
+            src/nuodb/dbc_payment.c
+            src/nuodb/dbc_order_status.c
+            src/nuodb/dbc_delivery.c
+            src/nonsp/dbc_nonsp.c
+            src/nonsp/dbc_integrity.c)
+    ENDIF(NONSP MATCHES "1")
 
 ELSE (NOT DEFINED DBMS)
     MESSAGE(FATAL_ERROR "Need to specify -DDBMS=drizzle|mysql|nuodb|pgsql|sqlite")

@@ -26,7 +26,7 @@ usage() {
     echo '       -u <database user>'
     echo '       -p <database password>'
     echo '       -s <database schema>'
-	echo '       -N <do not start database>'  
+    echo '       -N <do not start database>'  
     echo '       -v <verbose>'
     echo '       -w <scale factor>'
     echo ''
@@ -93,7 +93,15 @@ load_tables() {
         command_exec "${NUODB_LOADER} --user ${DB_USER} --password ${DB_PASSWORD} --import ${FILENAME},separator=tab --schema ${DB_NAME} --to \"${SQL_TEXT}\" ${DB_NAME}@${DB_HOST}:${DB_PORT} &"
     done
 
-	wait
+
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/delivery.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/new_order_2.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/new_order.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/order_status.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/payment.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/nuodb/stock_level.sql"
+
+    wait
 }
 
 create_tables() {

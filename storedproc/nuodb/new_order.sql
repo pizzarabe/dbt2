@@ -182,7 +182,7 @@ AS
 	tmp_total_amount = tmp_total_amount + tmp_ol_amount;
       END_IF;
     ELSE
-      counter = 15;
+      BREAK;
     END_IF;
     counter = counter + 1;
   END_WHILE;

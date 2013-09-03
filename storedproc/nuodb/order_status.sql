@@ -6,9 +6,9 @@ CREATE PROCEDURE order_status (in_c_id INT,
          	               in_c_w_id INT,
 	                       in_c_d_id INT,
 	                       in_c_last TEXT)
-RETURNS `order`(c_id INT, c_first VARCHAR(255), c_middle VARCHAR(255), c_last VARCHAR(255), c_balance NUMERIC,
-              o_id INT, o_carrier_id INT, o_entry_d VARCHAR(255), o_ol_cnt INT, 
-              ol_i_id INT, ol_supply_w_id INT, ol_quantity INT, ol_amount NUMERIC, ol_delivery_d VARCHAR(28))
+RETURNS `order`(c_id INT, c_first VARCHAR(255), c_middle VARCHAR(255), c_last VARCHAR(255), c_balance NUMERIC(24,12),
+              o_id INT, o_carrier_id INT, o_entry_d TIMESTAMP, o_ol_cnt INT, 
+              ol_i_id INT, ol_supply_w_id INT, ol_quantity REAL, ol_amount REAL, ol_delivery_d TIMESTAMP)
 AS
 	VAR out_c_id, out_c_first, out_c_middle, out_c_last, out_c_balance;
         VAR out_o_id, out_o_carrier_id, out_o_entry_d, out_o_ol_cnt;

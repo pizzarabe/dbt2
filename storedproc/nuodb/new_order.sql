@@ -85,7 +85,7 @@ AS
   out_d_tax, out_d_next_o_id = (SELECT d_tax, d_next_o_id
                                 FROM district   
                                 WHERE d_w_id = tmp_w_id
-                                AND d_id = tmp_d_id);
+                                AND d_id = tmp_d_id FOR UPDATE);
 
   o_id=out_d_next_o_id;
 

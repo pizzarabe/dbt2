@@ -40,19 +40,19 @@ AS
 
 
         out_w_name, out_w_street_1, out_w_street_2, out_w_city, out_w_state, out_w_zip =
-               SELECT w_name, w_street_1, w_street_2, w_city, w_state, w_zip
+               (SELECT w_name, w_street_1, w_street_2, w_city, w_state, w_zip
                FROM warehouse
-               WHERE w_id = in_w_id;
+               WHERE w_id = in_w_id);
 
         UPDATE warehouse
         SET w_ytd = w_ytd + in_h_amount
         WHERE w_id = in_w_id;
 
         out_d_name, out_d_street_1, out_d_street_2, out_d_city, out_d_state, out_d_zip =
-               SELECT d_name, d_street_1, d_street_2, d_city, d_state, d_zip
+               (SELECT d_name, d_street_1, d_street_2, d_city, d_state, d_zip
                FROM district
                WHERE d_id = in_d_id
-                 AND d_w_id = in_w_id;
+                 AND d_w_id = in_w_id);
 
         UPDATE district
         SET d_ytd = d_ytd + in_h_amount
@@ -64,26 +64,26 @@ AS
          * middle, not the first one.
          */
         IF (in_c_id = 0 )
-                out_c_id = SELECT c_id
+                out_c_id = (SELECT c_id
                            FROM customer
                            WHERE c_w_id = in_c_w_id
                              AND c_d_id = in_c_d_id
                              AND c_last = in_c_last
-                           ORDER BY c_first ASC limit 1;
+                           ORDER BY c_first ASC limit 1);
         ELSE
                 out_c_id = in_c_id;
         END_IF;
 
         out_c_first, out_c_middle, out_c_last, out_c_street_1, out_c_street_2, out_c_city, out_c_state, out_c_zip, out_c_phone,
         out_c_since, out_c_credit, out_c_credit_lim, out_c_discount, out_c_balance, out_c_data, out_c_ytd_payment = 
-                  SELECT c_first, c_middle, c_last, c_street_1, c_street_2, c_city,
+                  (SELECT c_first, c_middle, c_last, c_street_1, c_street_2, c_city,
                          c_state, c_zip, c_phone, c_since, c_credit,
                          c_credit_lim, c_discount, c_balance, c_data,
                          c_ytd_payment
                   FROM customer
                   WHERE c_w_id = in_c_w_id
                     AND c_d_id = in_c_d_id
-                    AND c_id = out_c_id;
+                    AND c_id = out_c_id);
 
 #        /* Check credit rating. */
         IF (out_c_credit = 'BC')

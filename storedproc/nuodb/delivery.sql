@@ -12,9 +12,9 @@ AS
 
    while (tmp_d_id <= 10 )
 
-     tmp_o_id = SELECT no_o_id
+     tmp_o_id = (SELECT no_o_id
                 FROM new_order
-                WHERE no_w_id = in_w_id AND no_d_id = tmp_d_id limit 1;
+                WHERE no_w_id = in_w_id AND no_d_id = tmp_d_id limit 1);
 
      IF (tmp_o_id > 0) 
        DELETE FROM new_order 
@@ -22,11 +22,11 @@ AS
          AND no_w_id = in_w_id 
          AND no_d_id = tmp_d_id;
  
-       out_c_id = SELECT o_c_id
+       out_c_id = (SELECT o_c_id
                   FROM orders
                   WHERE o_id = tmp_o_id
                     AND o_w_id = in_w_id
-                    AND o_d_id = tmp_d_id;
+                    AND o_d_id = tmp_d_id);
  
        UPDATE orders
        SET o_carrier_id = in_o_carrier_id
@@ -40,11 +40,11 @@ AS
          AND ol_w_id = in_w_id
          AND ol_d_id = tmp_d_id;
  
-       out_ol_amount = SELECT SUM(ol_amount * ol_quantity)
+       out_ol_amount = (SELECT SUM(ol_amount * ol_quantity)
                        FROM order_line
                        WHERE ol_o_id = tmp_o_id
                          AND ol_w_id = in_w_id
-                         AND ol_d_id = tmp_d_id;
+                         AND ol_d_id = tmp_d_id);
  
        UPDATE customer
        SET c_delivery_cnt = c_delivery_cnt + 1,

@@ -21,7 +21,7 @@ AS
         VAR	tmp_s_data;
 
 	out_s_quantity, tmp_s_dist, tmp_s_data = 
-             SELECT s_quantity, 
+             (SELECT s_quantity, 
 		CASE (in_d_id) 
                   WHEN 1 THEN s_dist_01
                   WHEN 2 THEN s_dist_02
@@ -37,7 +37,7 @@ AS
 		s_data
 		FROM stock
 		WHERE s_i_id = in_ol_i_id
-		  AND s_w_id = in_w_id;
+		  AND s_w_id = in_w_id);
 
 	IF (out_s_quantity > in_ol_quantity + 10 )
 		UPDATE stock

@@ -6,7 +6,7 @@ CREATE PROCEDURE order_status (in_c_id INT,
          	               in_c_w_id INT,
 	                       in_c_d_id INT,
 	                       in_c_last TEXT)
-RETURNS order(c_id INT, c_first VARCHAR(255), c_middle VARCHAR(255), c_last VARCHAR(255), c_balance NUMERIC,
+RETURNS `order`(c_id INT, c_first VARCHAR(255), c_middle VARCHAR(255), c_last VARCHAR(255), c_balance NUMERIC,
               o_id INT, o_carrier_id INT, o_entry_d VARCHAR(255), o_ol_cnt INT, 
               ol_i_id INT, ol_supply_w_id INT, ol_quantity INT, ol_amount NUMERIC, ol_delivery_d VARCHAR(28))
 AS
@@ -18,28 +18,28 @@ AS
 	 * middle, not the first one.
 	 */
 	IF (in_c_id = 0 )
-		out_c_id = SELECT c_id
+		out_c_id = (SELECT c_id
 		           FROM customer
 		           WHERE c_w_id = in_c_w_id
 		             AND c_d_id = in_c_d_id
 		             AND c_last = in_c_last
-		           ORDER BY c_first ASC limit 1;
+		           ORDER BY c_first ASC limit 1);
 	ELSE
 		out_c_id = in_c_id;
 	END_IF;
 
-	out_c_first, out_c_middle, out_c_last, out_c_balance = SELECT c_first, c_middle, c_last, c_balance
+	out_c_first, out_c_middle, out_c_last, out_c_balance = (SELECT c_first, c_middle, c_last, c_balance
 	                                                       FROM customer
 	                                                       WHERE c_w_id = in_c_w_id   
 	                                                         AND c_d_id = in_c_d_id
-	                                                         AND c_id = out_c_id;
+	                                                         AND c_id = out_c_id);
 
-	out_o_id, out_o_carrier_id, out_o_entry_d, out_o_ol_cnt = SELECT o_id, o_carrier_id, o_entry_d, o_ol_cnt
+	out_o_id, out_o_carrier_id, out_o_entry_d, out_o_ol_cnt = (SELECT o_id, o_carrier_id, o_entry_d, o_ol_cnt
 	                                                          FROM orders
 	                                                          WHERE o_w_id = in_c_w_id
   	                                                          AND o_d_id = in_c_d_id
   	                                                          AND o_c_id = out_c_id
-	                                                          ORDER BY o_id DESC limit 1;
+	                                                          ORDER BY o_id DESC limit 1);
 
         FOR SELECT ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_delivery_d
             FROM order_line
@@ -47,7 +47,7 @@ AS
                   AND ol_d_id = in_c_d_id
                   AND ol_o_id = out_o_id;
 
-            INSERT INTO order VALUES(out_c_id, out_c_first, out_c_middle, out_c_last, out_c_balance,
+            INSERT INTO `order` VALUES(out_c_id, out_c_first, out_c_middle, out_c_last, out_c_balance,
                                      out_o_id, out_o_carrier_id, out_o_entry_d, out_o_ol_cnt,
                                      ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_delivery_d);
         END_FOR;

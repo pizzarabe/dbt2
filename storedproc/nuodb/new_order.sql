@@ -78,14 +78,14 @@ AS
 
   o_id = 0;
 
-  out_w_tax = SELECT w_tax
-              FROM warehouse
-              WHERE w_id = tmp_w_id;
+  out_w_tax = (SELECT w_tax
+               FROM warehouse
+               WHERE w_id = tmp_w_id);
 
-  out_d_tax, out_d_next_o_id = SELECT d_tax, d_next_o_id
-                               FROM district   
-                               WHERE d_w_id = tmp_w_id
-                                 AND d_id = tmp_d_id;
+  out_d_tax, out_d_next_o_id = (SELECT d_tax, d_next_o_id
+                                FROM district   
+                                WHERE d_w_id = tmp_w_id
+                                AND d_id = tmp_d_id);
 
   o_id=out_d_next_o_id;
 
@@ -94,11 +94,11 @@ AS
   WHERE d_w_id = tmp_w_id
     AND d_id = tmp_d_id;
 
-  out_c_discount, out_c_last, out_c_credit = SELECT c_discount , c_last, c_credit
+  out_c_discount, out_c_last, out_c_credit = (SELECT c_discount , c_last, c_credit
                                              FROM customer
                                              WHERE c_w_id = tmp_w_id
                                                AND c_d_id = tmp_d_id
-                                               AND c_id = tmp_c_id;
+                                               AND c_id = tmp_c_id);
 
   INSERT INTO new_order (no_o_id, no_d_id, no_w_id)
   VALUES (out_d_next_o_id, tmp_d_id, tmp_w_id);
@@ -166,12 +166,12 @@ AS
                     WHEN 14 THEN ol_quantity15
                  END;
 
-      tmp_i_price, tmp_i_name, tmp_i_data = SELECT i_price, i_name, i_data
+      tmp_i_price, tmp_i_name, tmp_i_data = (SELECT i_price, i_name, i_data
                                             FROM item
-                                            WHERE i_id = tmp_i_id;
+                                            WHERE i_id = tmp_i_id);
 
       IF (tmp_i_price > 0 )
-	tmp_ol_amount = tmp_i_price * tmp_ol_quantity;
+	  	tmp_ol_amount = tmp_i_price * tmp_ol_quantity;
 
 	call new_order_2(tmp_w_id, tmp_d_id, tmp_i_id,
                     	 tmp_ol_quantity, tmp_i_price,

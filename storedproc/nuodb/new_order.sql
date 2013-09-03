@@ -82,18 +82,29 @@ AS
                FROM warehouse
                WHERE w_id = tmp_w_id);
 
-  out_d_tax, out_d_next_o_id = (SELECT d_tax, d_next_o_id
+  -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  -- Commented out a standard way of order id allocations, instead
+  -- using sequence.
+  --
+  -- out_d_tax, out_d_next_o_id = (SELECT d_tax, d_next_o_id
+  --                               FROM district   
+  --                               WHERE d_w_id = tmp_w_id
+  --                               AND d_id = tmp_d_id FOR UPDATE);
+
+  -- o_id=out_d_next_o_id;
+
+  -- UPDATE district
+  -- SET d_next_o_id = d_next_o_id + 1
+  -- WHERE d_w_id = tmp_w_id
+  --   AND d_id = tmp_d_id;
+
+  out_d_tax, out_d_next_o_id = (SELECT d_tax, (next value for order_seq) as d_next_o_id
                                 FROM district   
                                 WHERE d_w_id = tmp_w_id
-                                AND d_id = tmp_d_id FOR UPDATE);
+                                AND d_id = tmp_d_id);
 
   o_id=out_d_next_o_id;
-
-  UPDATE district
-  SET d_next_o_id = d_next_o_id + 1
-  WHERE d_w_id = tmp_w_id
-    AND d_id = tmp_d_id;
-
+  
   out_c_discount, out_c_last, out_c_credit = (SELECT c_discount , c_last, c_credit
                                              FROM customer
                                              WHERE c_w_id = tmp_w_id

@@ -247,7 +247,7 @@ create_tables() {
         s_order_cnt real,
         s_remote_cnt real,
         s_data varchar(50),
-        primary key (s_w_id, s_i_id, s_quantity)
+        primary key (s_w_id, s_i_id)
         )"
 
     TABLES="STOCK ITEM ORDER_LINE ORDERS NEW_ORDER HISTORY CUSTOMER ORDER_SEQ DISTRICT WAREHOUSE"

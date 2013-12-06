@@ -94,12 +94,12 @@ load_tables() {
     done
 
 
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/delivery.sql"
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/new_order_2.sql"
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/new_order.sql"
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/order_status.sql"
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/payment.sql"
-    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/stock_level.sql"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/delivery.sql >/dev/null"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/new_order_2.sql >/dev/null"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/new_order.sql >/dev/null"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/order_status.sql >/dev/null"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/payment.sql >/dev/null"
+    command_exec "${NUODB_SQL} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} ${DB_NAME}@${DB_HOST}:${DB_PORT} < ${top_dir}/storedproc/stock_level.sql >/dev/null"
 
     wait
 }

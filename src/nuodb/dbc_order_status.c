@@ -1,4 +1,3 @@
-
 #include "transaction_data.h"
 #include "nuodb_common.h"
 
@@ -14,6 +13,8 @@ int execute_order_status(struct db_context_t *dbc, struct order_status_t *data)
     {
         return ERROR;
     }
+
+    dbt2_sql_close_cursor(dbc, &result);
 
     return OK;
 }

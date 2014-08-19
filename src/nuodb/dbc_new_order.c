@@ -58,6 +58,8 @@ int  new_order(struct db_context_t *dbc, struct new_order_t *data, char ** vals,
     struct sql_result_t result;
     int i;
 
+    dbt2_init_values(vals, nvals);
+
     /* Loop through the last set of parameters. */
     for (i = 0; i < 15; i++) {
         ol_i_id[i] = data->order_line[i].ol_i_id;

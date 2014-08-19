@@ -236,7 +236,7 @@ echo "Stage 1. Starting up client..."
 CLIENT_OUTPUT_DIR=${OUTPUT_DIR}/`hostname`/client
 mkdir -p ${CLIENT_OUTPUT_DIR}
 
-${bin_dir}/dbt2-client ${CLIENT_COMMAND_ARGS} -p ${CLIENT_PORT} > \
+${bin_dir}/dbt2-client ${CLIENT_COMMAND_ARGS} -p ${CLIENT_PORT} -o ${CLIENT_OUTPUT_DIR} > \
 	${CLIENT_OUTPUT_DIR}/client.out 2>&1 || exit 1 &
 
 SLEEPYTIME=`expr ${WNUM} \* ${SLEEPY}`

@@ -29,6 +29,8 @@ usage() {
     echo '       -N <do not start database>'  
     echo '       -v <verbose>'
     echo '       -w <scale factor>'
+    echo '       -t <number of table partitions>'
+    echo '       -m <CSL of storage groups>'
     echo ''
     echo 'Example: bash build_db.sh -d dbt2 -f /tmp/dbt2-w3'
     echo ''
@@ -117,7 +119,9 @@ create_tables() {
         w_tax real,
         w_ytd numeric(24, 12),
         primary key (w_id)
-        ) with record_batching = 1"
+        )"
+
+    WAREHOUSE_PARTITION_KEY=w_id
 
 #    DISTRICT="create table district (
 #        d_id int not null default '0',
@@ -149,7 +153,9 @@ create_tables() {
         d_ytd numeric(24, 12),
         d_next_o_id integer,
         primary key (d_w_id, d_id)
-        ) with record_batching = 2"
+        )"
+
+    DISTRICT_PARTITION_KEY=d_w_id
 
     CUSTOMER="create table customer (
         c_id int not null default '0',
@@ -176,6 +182,8 @@ create_tables() {
         primary key (c_w_id, c_d_id, c_id)
         )"
 
+    CUSTOMER_PARTITION_KEY=c_w_id
+
     HISTORY="create table history (
         h_c_id int,
         h_c_d_id int,
@@ -194,6 +202,8 @@ create_tables() {
         primary key (no_w_id, no_d_id, no_o_id)
         )"
 
+    NEW_ORDER_PARTITION_KEY=no_w_id
+
     ORDERS="create table orders (
         o_id int not null default '0',
         o_d_id int not null default '0',
@@ -205,6 +215,8 @@ create_tables() {
         o_all_local real,
         primary key (o_w_id, o_d_id, o_id)
         )"
+
+    ORDERS_PARTITION_KEY=o_w_id
 
     ORDER_LINE="create table order_line (
         ol_o_id int not null default '0',
@@ -219,6 +231,8 @@ create_tables() {
         ol_dist_info varchar(24),
         primary key (ol_w_id, ol_d_id, ol_o_id, ol_number)
         )"
+
+    ORDER_LINE_PARTITION_KEY=ol_w_id
 
     ITEM="create table item (
         i_id int not null default '0',
@@ -250,18 +264,29 @@ create_tables() {
         primary key (s_w_id, s_i_id)
         )"
 
+    STOCK_PARTITION_KEY=s_w_id
+
     TABLES="STOCK ITEM ORDER_LINE ORDERS NEW_ORDER HISTORY CUSTOMER ORDER_SEQ DISTRICT WAREHOUSE"
     for TABLE in $TABLES ;
     do
         echo "Creating table $TABLE"
         FILE="$(mktemp 'XXXXXXXXXX.sql')" || { echo "Failed to create temp file"; exit 1; }
-        eval "echo -e \$$TABLE \; \\\\n quit" >> $FILE
+        if [ ${TABLE_PARTITIONS} -gt 0 ]; then
+            PARTITION_KEY="${TABLE}_PARTITION_KEY"
+            PARTITION_KEY=${!PARTITION_KEY}
+
+            PARTITION_POLICY=${PARTITION_KEY:+"PARTITION BY RANGE(${PARTITION_KEY}) ${PARTITION_RANGES}"}
+        fi
+        
+        eval "echo -e \$$TABLE \$PARTITION_POLICY \; \\\\n quit" >> $FILE
         command_exec "$NUODB_SQL ${DB_NAME}@${DB_HOST}:${DB_PORT} --user ${DB_USER} --password ${DB_PASSWORD} --schema ${DB_NAME} --file ${FILE}"
         rm -f $FILE
     done
 }
 
-while getopts "n:d:gs:h:u:p:vs:w:Ns:" opt; do
+TABLE_PARTITIONS=0
+
+while getopts "n:d:gs:h:u:p:vs:w:Ns:t:m:" opt; do
     case $opt in
     n)
         DB_NAME=${OPTARG}
@@ -290,11 +315,30 @@ while getopts "n:d:gs:h:u:p:vs:w:Ns:" opt; do
     w)
         WAREHOUSES=${OPTARG}
         ;;
+    t)
+        TABLE_PARTITIONS=${OPTARG}
+        ;;
+    m)
+        IFS=',' read -ra STORAGE_GROUP_NAMES <<< "${OPTARG}"
+        ;;
     ?)
         usage
         exit 1
         ;;
     esac
+done
+
+PARTITION=0
+PARTITIONS_PER_STORAGE_GROUP=$((TABLE_PARTITIONS / ${#STORAGE_GROUP_NAMES[@]}))
+echo $PARTITIONS_PER_STORAGE_GROUP
+while [ ${PARTITION} -lt ${TABLE_PARTITIONS} ]; do
+    SG_ID=$((PARTITION / PARTITIONS_PER_STORAGE_GROUP))
+    if [ $SG_ID -ge ${#STORAGE_GROUP_NAMES[@]} ]; then
+        SG_ID=$((${#STORAGE_GROUP_NAMES[@]} - 1))
+    fi
+    PARTITION=$((PARTITION + 1))
+    W_ID_MAX=$((WAREHOUSES / TABLE_PARTITIONS * PARTITION + 1))
+    PARTITION_RANGES="${PARTITION_RANGES} PARTITION tp_${PARTITION} VALUES LESS THAN (${W_ID_MAX}) STORE IN ${STORAGE_GROUP_NAMES[ $SG_ID ]}"
 done
 
 echo ""

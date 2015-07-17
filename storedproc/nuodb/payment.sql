@@ -44,20 +44,11 @@ AS
                FROM warehouse
                WHERE w_id = in_w_id);
 
-        UPDATE warehouse
-        SET w_ytd = w_ytd + in_h_amount
-        WHERE w_id = in_w_id;
-
         out_d_name, out_d_street_1, out_d_street_2, out_d_city, out_d_state, out_d_zip =
                (SELECT d_name, d_street_1, d_street_2, d_city, d_state, d_zip
                FROM district
                WHERE d_id = in_d_id
                  AND d_w_id = in_w_id);
-
-        UPDATE district
-        SET d_ytd = d_ytd + in_h_amount
-        WHERE d_id = in_d_id
-          AND d_w_id = in_w_id;
 
         /*
          * Pick a customer by searching for c_last, should pick the one in the
@@ -111,6 +102,16 @@ AS
                              h_date, h_amount, h_data)
         VALUES (out_c_id, in_c_d_id, in_c_w_id, in_d_id, in_w_id,
                 now(), in_h_amount, tmp_h_data);
+
+        UPDATE district
+        SET d_ytd = d_ytd + in_h_amount
+        WHERE d_id = in_d_id
+          AND d_w_id = in_w_id;
+
+        UPDATE warehouse
+        SET w_ytd = w_ytd + in_h_amount
+        WHERE w_id = in_w_id;
+
 
 END_PROCEDURE~
 

@@ -39,7 +39,7 @@ AS
 	                                                          WHERE o_w_id = in_c_w_id
   	                                                          AND o_d_id = in_c_d_id
   	                                                          AND o_c_id = out_c_id
-	                                                          ORDER BY o_id DESC limit 1);
+	                                                          ORDER BY o_id, 1 DESC limit 1);
 
         FOR SELECT ol_i_id, ol_supply_w_id, ol_quantity, ol_amount, ol_delivery_d
             FROM order_line

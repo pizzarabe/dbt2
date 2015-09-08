@@ -8,8 +8,7 @@ env:
 
 notifications:
   recipients:
-    - buck.robert.j@gmail.com
-    - rbuck@nuodb.com
+    - drivers@nuodb.com
 
 before_install:
   - wget -q http://www.nuodb.com/latest/releases/nuodb-1.1.1.linux.x64.deb --output-document=/var/tmp/nuodb.deb

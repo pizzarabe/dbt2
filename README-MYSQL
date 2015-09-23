@@ -56,7 +56,7 @@ NOTE:
      -d - output path for data files (example: -d /tmp/dbt2-w3)
      - mode (example: --mysql)
 
-   datagen -w 3 -d /tmp/dbt2-w3 --mysql
+   dbt2-datagen -w 3 -d /tmp/dbt2-w3 --mysql
 
    Please note that output directory for data file should exist.
 
@@ -69,17 +69,21 @@ NOTE:
 
    usage: dbt2-mysql-build-db [options]
    options:
+       -p <defaults file>
        -d <database name>
        -f <path to dataset files>
-       -m <database scheme [OPTIMIZED|ORIG] (default scheme OPTIMIZED)>
-       -c <mysql.cnf defaults file>
+       -g (generate data files)
+       -m <database scheme [OPTIMIZED|ORIG] (default OPTIMIZED)>
        -s <database socket>
        -h <database host>
        -u <database user>
-       -p <database password>
+       -P <database password>
+       -N <do not start database>
        -e <storage engine: [MYISAM|INNODB|BDB]. (default INNODB)>
        -l <to use LOCAL keyword while loading dataset>
-       -v <verbose output>
+       -v <verbose>
+       -w <scale factor>
+
 
    Example: dbt2-mysql-build-db -d dbt2 -f /tmp/dbt2-w3 -s /tmp/mysql.sock -p ~/src/dbt2/examples/mysql/mysql-dbt2.cnf
 
